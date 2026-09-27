@@ -1,0 +1,3529 @@
+<!DOCTYPE html>
+<html lang="id" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
+<meta name="theme-color" content="#5B4BFF">
+<meta name="description" content="G-Wallet Demo — simulator dompet digital untuk UI/UX dan pembelajaran. Powered by Xtan. Bukan aplikasi pembayaran sungguhan.">
+<title>G-Wallet Demo — Powered by Xtan</title>
+<style>
+/* ============================================================
+   G-WALLET DEMO — Stylesheet
+   Original design. No proprietary assets.
+   ============================================================ */
+:root{
+  --bg:#F2F4FA;
+  --surface:#FFFFFF;
+  --surface-2:#F7F8FD;
+  --surface-3:#EEF0F8;
+  --text:#0E1020;
+  --text-dim:#6B7280;
+  --text-faint:#9AA1B4;
+  --border:#E5E8F2;
+  --accent:#5B4BFF;
+  --accent-soft:#EEEBFF;
+  --accent-2:#00C2A8;
+  --danger:#EF4444;
+  --danger-soft:#FEECEC;
+  --success:#0FA968;
+  --success-soft:#E6F7F0;
+  --warn:#F59E0B;
+  --shadow-sm:0 1px 2px rgba(16,20,45,.05);
+  --shadow:0 4px 18px -6px rgba(16,20,45,.13);
+  --shadow-lg:0 18px 40px -14px rgba(16,20,45,.28);
+  --radius:18px;
+  --nav-h:66px;
+}
+html[data-theme="dark"]{
+  --bg:#080A14;
+  --surface:#131728;
+  --surface-2:#181D31;
+  --surface-3:#1F2439;
+  --text:#EDEFF8;
+  --text-dim:#98A0B8;
+  --text-faint:#6C7590;
+  --border:#252B42;
+  --accent:#7C6BFF;
+  --accent-soft:#1D1B3C;
+  --accent-2:#00D6B8;
+  --danger:#FF6B6B;
+  --danger-soft:#2A1720;
+  --success:#2FD08A;
+  --success-soft:#10261F;
+  --shadow-sm:0 1px 2px rgba(0,0,0,.3);
+  --shadow:0 4px 18px -6px rgba(0,0,0,.55);
+  --shadow-lg:0 18px 40px -14px rgba(0,0,0,.7);
+}
+*,*::before,*::after{box-sizing:border-box}
+html,body{height:100%}
+body{
+  margin:0;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  -webkit-font-smoothing:antialiased;
+  -webkit-tap-highlight-color:transparent;
+  overscroll-behavior-y:none;
+}
+body::before{
+  content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
+  background:
+    radial-gradient(600px 320px at 12% -6%, rgba(91,75,255,.10), transparent 70%),
+    radial-gradient(560px 300px at 92% 8%, rgba(0,194,168,.09), transparent 70%);
+}
+html[data-theme="dark"] body::before{
+  background:
+    radial-gradient(600px 320px at 12% -6%, rgba(124,107,255,.16), transparent 70%),
+    radial-gradient(560px 300px at 92% 8%, rgba(0,214,184,.10), transparent 70%);
+}
+button,input,select,textarea{font:inherit;color:inherit}
+button{background:none;border:none;cursor:pointer;padding:0}
+input,select,textarea{outline:none}
+ul{margin:0;padding:0;list-style:none}
+h1,h2,h3,h4,p{margin:0}
+svg{display:block}
+
+html.no-anim *{animation:none!important;transition:none!important}
+html.no-fx .balance-card{box-shadow:none!important}
+html.no-fx .balance-card::after,
+html.no-fx .balance-card::before{display:none}
+html.no-fx .card,html.no-fx .sheet,html.no-fx .shortcut{box-shadow:none!important}
+html.no-fx .glass{backdrop-filter:none!important}
+
+/* ---------- Layout shell ---------- */
+.app{
+  position:relative;z-index:1;
+  max-width:480px;margin:0 auto;min-height:100%;
+  display:flex;flex-direction:column;
+  background:var(--bg);
+}
+@media(min-width:560px){
+  .app{
+    box-shadow:0 0 0 1px var(--border), 0 30px 80px -30px rgba(0,0,0,.4);
+    min-height:100vh;
+  }
+}
+.sticky-top{position:sticky;top:0;z-index:60}
+.demo-bar{
+  background:linear-gradient(90deg,#14172a,#22263f,#14172a);
+  color:#FFC857;
+  font-size:9.5px;font-weight:800;letter-spacing:1.6px;
+  text-align:center;padding:6px 8px;
+  text-transform:uppercase;
+  border-bottom:1px solid rgba(255,200,87,.18);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.topbar{
+  display:flex;align-items:center;gap:10px;
+  padding:10px 14px;
+  background:color-mix(in srgb, var(--surface) 88%, transparent);
+  backdrop-filter:saturate(180%) blur(14px);
+  -webkit-backdrop-filter:saturate(180%) blur(14px);
+  border-bottom:1px solid var(--border);
+}
+.brand{display:flex;align-items:center;gap:10px;flex:1;min-width:0}
+.brand-mark{
+  width:36px;height:36px;border-radius:11px;flex:none;
+  background:linear-gradient(135deg,var(--accent),#8E7BFF 55%,var(--accent-2) 140%);
+  color:#fff;font-weight:900;font-size:17px;
+  display:grid;place-items:center;
+  box-shadow:0 6px 14px -6px rgba(91,75,255,.75);
+  letter-spacing:-.5px;
+}
+.brand-txt{display:flex;flex-direction:column;line-height:1.15;min-width:0}
+.brand-name{font-size:14.5px;font-weight:800;letter-spacing:-.2px;display:flex;align-items:center;gap:6px}
+.brand-name em{
+  font-style:normal;font-size:8.5px;font-weight:900;letter-spacing:.8px;
+  background:#FFC857;color:#1A1405;padding:2px 5px;border-radius:5px;
+}
+.brand-sub{font-size:10px;color:var(--text-faint);font-weight:600;letter-spacing:.2px}
+.icon-btn{
+  width:38px;height:38px;border-radius:12px;flex:none;
+  display:grid;place-items:center;
+  color:var(--text-dim);
+  background:var(--surface-2);
+  border:1px solid var(--border);
+  transition:transform .16s ease, background .2s, color .2s;
+  position:relative;
+}
+.icon-btn:active{transform:scale(.92);background:var(--surface-3)}
+.icon-btn .dot{
+  position:absolute;top:7px;right:7px;width:8px;height:8px;border-radius:50%;
+  background:var(--danger);border:2px solid var(--surface);display:none;
+}
+.icon-btn .dot.on{display:block}
+.ic-wrap{display:inline-flex;align-items:center;justify-content:center}
+
+/* ---------- Main / pages ---------- */
+main{flex:1;padding:14px 14px calc(var(--nav-h) + 34px);}
+.page{display:none}
+.page.active{display:block;animation:pageIn .32s cubic-bezier(.22,.9,.3,1)}
+@keyframes pageIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+.page-head{display:flex;align-items:center;gap:10px;margin:2px 0 14px}
+.page-head h2{font-size:19px;font-weight:800;letter-spacing:-.4px}
+.page-head p{font-size:11.5px;color:var(--text-faint);font-weight:600;margin-top:2px}
+
+/* ---------- Cards ---------- */
+.card{
+  background:var(--surface);
+  border:1px solid var(--border);
+  border-radius:var(--radius);
+  box-shadow:var(--shadow);
+  padding:16px;
+  margin-bottom:14px;
+}
+.card.tight{padding:12px}
+.card.flat{box-shadow:none}
+
+/* ---------- Balance card ---------- */
+.balance-card{
+  position:relative;overflow:hidden;
+  border-radius:22px;
+  padding:18px 18px 16px;
+  color:#fff;
+  background:linear-gradient(135deg,#4B3BE8 0%,#6B54FF 42%,#00C2A8 128%);
+  box-shadow:0 18px 38px -18px rgba(75,59,232,.95), 0 4px 14px -6px rgba(0,0,0,.3);
+  margin-bottom:14px;
+  isolation:isolate;
+}
+.balance-card::before{
+  content:"";position:absolute;width:220px;height:220px;border-radius:50%;
+  background:radial-gradient(circle,rgba(255,255,255,.22),transparent 68%);
+  top:-110px;right:-70px;z-index:-1;
+}
+.balance-card::after{
+  content:"";position:absolute;width:160px;height:160px;border-radius:50%;
+  background:radial-gradient(circle,rgba(255,255,255,.12),transparent 70%);
+  bottom:-96px;left:-46px;z-index:-1;
+}
+.bc-top{display:flex;align-items:center;justify-content:space-between;gap:8px}
+.bc-label{font-size:11px;font-weight:700;letter-spacing:.9px;opacity:.82;text-transform:uppercase}
+.bc-eye{
+  width:32px;height:32px;border-radius:10px;display:grid;place-items:center;
+  background:rgba(255,255,255,.16);color:#fff;
+  border:1px solid rgba(255,255,255,.22);
+  transition:transform .18s, background .2s;
+}
+.bc-eye:active{transform:scale(.9);background:rgba(255,255,255,.28)}
+.bc-amount{
+  font-size:31px;font-weight:850;letter-spacing:-1.1px;
+  margin:8px 0 4px;font-variant-numeric:tabular-nums;
+  text-shadow:0 2px 12px rgba(0,0,0,.18);
+  word-break:break-all;
+}
+.bc-meta{display:flex;align-items:center;gap:6px;font-size:11px;font-weight:650;opacity:.9}
+.bc-pill{
+  display:inline-flex;align-items:center;gap:4px;
+  background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.22);
+  padding:3px 8px;border-radius:99px;font-size:9.5px;font-weight:800;letter-spacing:.6px;
+}
+.bc-actions{
+  display:grid;grid-template-columns:repeat(4,1fr);gap:8px;
+  margin-top:16px;padding-top:14px;
+  border-top:1px solid rgba(255,255,255,.18);
+}
+.bc-act{
+  display:flex;flex-direction:column;align-items:center;gap:6px;
+  color:#fff;font-size:10px;font-weight:700;
+  padding:7px 2px;border-radius:13px;
+  background:rgba(255,255,255,.11);
+  border:1px solid rgba(255,255,255,.14);
+  transition:transform .16s, background .2s;
+}
+.bc-act:active{transform:scale(.94);background:rgba(255,255,255,.24)}
+.bc-act .ic-wrap{
+  width:30px;height:30px;border-radius:9px;background:rgba(255,255,255,.19);
+  display:grid;place-items:center;
+}
+
+/* ---------- Section titles ---------- */
+.sec-head{display:flex;align-items:center;justify-content:space-between;margin:18px 2px 10px}
+.sec-head h3{font-size:14.5px;font-weight:800;letter-spacing:-.2px}
+.sec-head button{font-size:11.5px;font-weight:750;color:var(--accent);padding:4px 6px;border-radius:8px}
+.sec-head button:active{background:var(--accent-soft)}
+
+/* ---------- Shortcuts ---------- */
+.shortcut-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.shortcut{
+  display:flex;flex-direction:column;align-items:center;gap:6px;
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:15px;padding:11px 4px 9px;
+  box-shadow:var(--shadow-sm);
+  transition:transform .16s cubic-bezier(.3,1.4,.5,1), background .2s;
+}
+.shortcut:active{transform:scale(.93);background:var(--surface-2)}
+.sc-ico{
+  width:36px;height:36px;border-radius:11px;display:grid;place-items:center;
+  background:var(--accent-soft);color:var(--accent);
+}
+.sc-ico.g2{background:var(--success-soft);color:var(--success)}
+.sc-ico.g3{background:#FFF3E0;color:#E08800}
+.sc-ico.g4{background:#EAF3FF;color:#2A7FDB}
+.sc-ico.g5{background:var(--danger-soft);color:var(--danger)}
+html[data-theme="dark"] .sc-ico.g3{background:#2A2110;color:#F5A623}
+html[data-theme="dark"] .sc-ico.g4{background:#0F1E30;color:#5AA9F0}
+.shortcut span{font-size:9.6px;font-weight:700;color:var(--text-dim);text-align:center;line-height:1.2}
+
+/* ---------- Promo banner ---------- */
+.promo-scroll{
+  display:flex;gap:10px;overflow-x:auto;padding:2px 2px 10px;
+  scroll-snap-type:x mandatory;
+  -webkit-overflow-scrolling:touch;
+  scrollbar-width:none;
+}
+.promo-scroll::-webkit-scrollbar{display:none}
+.promo-card{
+  flex:0 0 78%;scroll-snap-align:start;
+  border-radius:18px;padding:14px;
+  color:#fff;position:relative;overflow:hidden;
+  min-height:104px;display:flex;flex-direction:column;justify-content:space-between;
+  box-shadow:var(--shadow);
+  transition:transform .18s;
+  text-align:left;
+}
+.promo-card:active{transform:scale(.97)}
+.promo-card.p1{background:linear-gradient(135deg,#5B4BFF,#8E7BFF)}
+.promo-card.p2{background:linear-gradient(135deg,#00A88F,#00D6B8)}
+.promo-card.p3{background:linear-gradient(135deg,#E0489A,#FF7BB8)}
+.promo-card.p4{background:linear-gradient(135deg,#F0710A,#FFA940)}
+.promo-card::after{
+  content:"";position:absolute;width:130px;height:130px;border-radius:50%;
+  background:rgba(255,255,255,.16);right:-46px;top:-52px;
+}
+.promo-tag{
+  display:inline-block;font-size:9px;font-weight:900;letter-spacing:.9px;
+  background:rgba(255,255,255,.24);padding:3px 8px;border-radius:99px;
+  border:1px solid rgba(255,255,255,.3);align-self:flex-start;
+}
+.promo-card h4{font-size:15.5px;font-weight:850;letter-spacing:-.3px;margin:8px 0 3px;position:relative}
+.promo-card p{font-size:10.5px;opacity:.9;font-weight:600;position:relative}
+
+/* ---------- Stats ---------- */
+.stat-row{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.stat-box{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:15px;padding:11px 10px;box-shadow:var(--shadow-sm);
+}
+.stat-box .lb{font-size:9.5px;font-weight:750;color:var(--text-faint);letter-spacing:.4px;text-transform:uppercase;display:flex;align-items:center;gap:4px}
+.stat-box .vl{font-size:14px;font-weight:850;letter-spacing:-.4px;margin-top:6px;font-variant-numeric:tabular-nums;word-break:break-all}
+.stat-box .vl.in{color:var(--success)}
+.stat-box .vl.out{color:var(--danger)}
+
+/* ---------- Chart ---------- */
+.chart{
+  display:flex;align-items:flex-end;justify-content:space-between;
+  gap:6px;height:104px;padding:8px 2px 0;
+}
+.chart-col{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;height:100%;justify-content:flex-end}
+.chart-bars{display:flex;align-items:flex-end;gap:2px;height:100%;width:100%;justify-content:center}
+.chart-bar{
+  width:7px;border-radius:4px 4px 2px 2px;min-height:3px;
+  transition:height .5s cubic-bezier(.22,.9,.3,1);
+}
+.chart-bar.in{background:linear-gradient(180deg,var(--success),#0A7A4C)}
+.chart-bar.out{background:linear-gradient(180deg,var(--danger),#B91C1C)}
+.chart-lbl{font-size:9px;font-weight:750;color:var(--text-faint)}
+.chart-legend{display:flex;gap:14px;justify-content:center;margin-top:10px;font-size:10px;font-weight:700;color:var(--text-dim)}
+.chart-legend i{display:inline-block;width:9px;height:9px;border-radius:3px;margin-right:5px;vertical-align:-1px}
+
+/* ---------- Transaction list ---------- */
+.tx-list{display:flex;flex-direction:column;gap:8px}
+.tx-item{
+  display:flex;align-items:center;gap:11px;
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:15px;padding:11px 12px;
+  box-shadow:var(--shadow-sm);
+  transition:transform .16s, background .2s;
+  width:100%;text-align:left;
+}
+.tx-item:active{transform:scale(.985);background:var(--surface-2)}
+.tx-ico{
+  width:38px;height:38px;border-radius:12px;flex:none;
+  display:grid;place-items:center;
+  background:var(--accent-soft);color:var(--accent);
+}
+.tx-ico.in{background:var(--success-soft);color:var(--success)}
+.tx-ico.out{background:var(--danger-soft);color:var(--danger)}
+.tx-mid{flex:1;min-width:0}
+.tx-title{font-size:13px;font-weight:750;letter-spacing:-.1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tx-sub{font-size:10.5px;color:var(--text-faint);font-weight:600;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.tx-amt{font-size:13px;font-weight:800;letter-spacing:-.2px;white-space:nowrap;font-variant-numeric:tabular-nums}
+.tx-amt.in{color:var(--success)}
+.tx-amt.out{color:var(--text)}
+
+.day-label{
+  font-size:10.5px;font-weight:800;color:var(--text-faint);
+  letter-spacing:.6px;text-transform:uppercase;
+  margin:14px 4px 8px;
+}
+
+/* ---------- Empty state ---------- */
+.empty{
+  text-align:center;padding:36px 18px;color:var(--text-faint);
+}
+.empty .eico{
+  width:62px;height:62px;border-radius:20px;margin:0 auto 12px;
+  background:var(--surface-2);border:1px solid var(--border);
+  display:grid;place-items:center;color:var(--text-faint);
+}
+.empty h4{font-size:13.5px;font-weight:800;color:var(--text-dim);margin-bottom:4px}
+.empty p{font-size:11.5px;font-weight:600;line-height:1.5}
+
+/* ---------- Forms ---------- */
+.field{margin-bottom:13px}
+.field label{
+  display:block;font-size:11px;font-weight:750;color:var(--text-dim);
+  margin-bottom:6px;letter-spacing:.2px;
+}
+.input,select.input,textarea.input{
+  width:100%;padding:12px 13px;
+  background:var(--surface-2);
+  border:1.5px solid var(--border);
+  border-radius:13px;
+  font-size:14px;font-weight:650;
+  transition:border-color .2s, background .2s;
+  -webkit-appearance:none;appearance:none;
+}
+.input:focus{border-color:var(--accent);background:var(--surface)}
+.input::placeholder{color:var(--text-faint);font-weight:600}
+textarea.input{resize:none;min-height:66px;line-height:1.5}
+select.input{
+  background-image:url("data:image/svg+xml;charset=utf-8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%236B7280' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+  background-repeat:no-repeat;background-position:right 13px center;
+  padding-right:38px;
+}
+.amount-input{
+  font-size:24px!important;font-weight:850!important;letter-spacing:-.6px;
+  text-align:center;padding:16px 13px!important;
+  font-variant-numeric:tabular-nums;
+}
+.input-prefix{
+  position:relative;
+}
+.input-prefix .pfx{
+  position:absolute;left:14px;top:50%;transform:translateY(-50%);
+  font-size:15px;font-weight:800;color:var(--text-faint);pointer-events:none;
+}
+.input-prefix .input{padding-left:40px}
+
+/* ---------- Buttons ---------- */
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:7px;
+  padding:13px 18px;border-radius:14px;
+  font-size:13.5px;font-weight:800;letter-spacing:-.1px;
+  transition:transform .15s, opacity .2s, background .2s;
+  border:1.5px solid transparent;
+  white-space:nowrap;
+}
+.btn:active{transform:scale(.965)}
+.btn.full{width:100%}
+.btn-primary{
+  background:linear-gradient(135deg,var(--accent),#7C6BFF);
+  color:#fff;
+  box-shadow:0 10px 22px -12px rgba(91,75,255,1);
+}
+.btn-primary:disabled{opacity:.45;box-shadow:none}
+.btn-ghost{
+  background:var(--surface-2);color:var(--text);
+  border-color:var(--border);
+}
+.btn-soft{background:var(--accent-soft);color:var(--accent)}
+.btn-danger{background:var(--danger-soft);color:var(--danger);border-color:transparent}
+.btn-danger-solid{background:var(--danger);color:#fff}
+.btn-success{background:var(--success);color:#fff}
+.btn-row{display:flex;gap:9px}
+.btn-row .btn{flex:1}
+
+/* ---------- Chips ---------- */
+.chips{display:flex;gap:7px;flex-wrap:wrap}
+.chips.scroll{flex-wrap:nowrap;overflow-x:auto;padding-bottom:4px;scrollbar-width:none}
+.chips.scroll::-webkit-scrollbar{display:none}
+.chip{
+  padding:8px 13px;border-radius:99px;
+  background:var(--surface-2);border:1.5px solid var(--border);
+  font-size:11.5px;font-weight:750;color:var(--text-dim);
+  white-space:nowrap;transition:all .18s;
+}
+.chip:active{transform:scale(.94)}
+.chip.on{background:var(--accent);border-color:var(--accent);color:#fff}
+.chip.amt{font-variant-numeric:tabular-nums}
+
+/* ---------- Amount presets ---------- */
+.preset-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.preset{
+  padding:11px 6px;border-radius:13px;text-align:center;
+  background:var(--surface-2);border:1.5px solid var(--border);
+  font-size:11.5px;font-weight:800;color:var(--text-dim);
+  transition:all .18s;font-variant-numeric:tabular-nums;
+}
+.preset:active{transform:scale(.95)}
+.preset.on{background:var(--accent-soft);border-color:var(--accent);color:var(--accent)}
+
+/* ---------- Simulation banner ---------- */
+.sim-banner{
+  display:flex;align-items:center;gap:9px;
+  background:linear-gradient(90deg,rgba(245,158,11,.14),rgba(245,158,11,.05));
+  border:1px solid rgba(245,158,11,.35);
+  border-radius:13px;padding:10px 12px;
+  font-size:10.5px;font-weight:750;color:#B45309;
+  line-height:1.4;margin-bottom:13px;
+}
+html[data-theme="dark"] .sim-banner{color:#FBBF24}
+.sim-banner .ic-wrap{flex:none;color:#D97706}
+html[data-theme="dark"] .sim-banner .ic-wrap{color:#FBBF24}
+
+/* ---------- Sheet / modal ---------- */
+.sheet-backdrop{
+  position:fixed;inset:0;z-index:1000;
+  background:rgba(8,10,22,.55);
+  backdrop-filter:blur(3px);
+  -webkit-backdrop-filter:blur(3px);
+  display:flex;align-items:flex-end;justify-content:center;
+  opacity:0;transition:opacity .26s ease;
+}
+.sheet-backdrop.open{opacity:1}
+.sheet{
+  width:100%;max-width:480px;
+  background:var(--surface);
+  border-radius:24px 24px 0 0;
+  border-top:1px solid var(--border);
+  max-height:92vh;
+  display:flex;flex-direction:column;
+  transform:translateY(100%);
+  transition:transform .34s cubic-bezier(.22,.9,.3,1);
+  box-shadow:0 -20px 50px -20px rgba(0,0,0,.5);
+  padding-bottom:env(safe-area-inset-bottom);
+}
+.sheet-backdrop.open .sheet{transform:none}
+.sheet-handle{
+  width:38px;height:4px;border-radius:99px;background:var(--border);
+  margin:9px auto 3px;flex:none;
+}
+.sheet-head{
+  display:flex;align-items:flex-start;gap:10px;
+  padding:8px 16px 12px;flex:none;
+}
+.sheet-title{font-size:16px;font-weight:850;letter-spacing:-.3px}
+.sheet-sub{font-size:11px;color:var(--text-faint);font-weight:600;margin-top:3px;line-height:1.4}
+.sheet-head .icon-btn{width:32px;height:32px;border-radius:10px}
+.sheet-body{padding:0 16px 4px;overflow-y:auto;flex:1;-webkit-overflow-scrolling:touch}
+.sheet-foot{
+  padding:12px 16px calc(16px + env(safe-area-inset-bottom));
+  flex:none;border-top:1px solid var(--border);
+  background:var(--surface);
+  display:flex;gap:9px;
+}
+.sheet-foot .btn{flex:1}
+
+/* ---------- Detail rows ---------- */
+.drow{
+  display:flex;align-items:flex-start;justify-content:space-between;gap:14px;
+  padding:11px 0;border-bottom:1px dashed var(--border);
+}
+.drow:last-child{border-bottom:none}
+.drow .k{font-size:11.5px;font-weight:700;color:var(--text-faint);flex:none}
+.drow .v{font-size:12.5px;font-weight:750;text-align:right;word-break:break-word}
+.drow .v.mono{font-variant-numeric:tabular-nums;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11.5px}
+
+/* ---------- Success screen ---------- */
+.success-wrap{text-align:center;padding:8px 0 4px}
+.success-ico{
+  width:72px;height:72px;border-radius:50%;margin:0 auto 14px;
+  display:grid;place-items:center;
+  background:var(--success-soft);color:var(--success);
+  animation:pop .45s cubic-bezier(.2,1.5,.4,1);
+}
+@keyframes pop{0%{transform:scale(.4);opacity:0}100%{transform:scale(1);opacity:1}}
+.success-wrap h3{font-size:17px;font-weight:850;letter-spacing:-.3px}
+.success-wrap .amt{font-size:27px;font-weight:850;letter-spacing:-.9px;margin:10px 0 4px;font-variant-numeric:tabular-nums}
+.success-wrap p{font-size:11.5px;color:var(--text-faint);font-weight:600;line-height:1.55}
+
+/* ---------- QR ---------- */
+.qr-frame{
+  width:100%;max-width:250px;margin:0 auto;
+  aspect-ratio:1;background:#fff;border-radius:18px;padding:12px;
+  box-shadow:0 8px 26px -12px rgba(0,0,0,.35);
+  border:1px solid var(--border);
+  position:relative;
+}
+.qr-frame svg{width:100%;height:100%;display:block;border-radius:6px}
+.qr-watermark{
+  position:absolute;bottom:14px;right:14px;
+  background:rgba(20,23,42,.82);color:#FFC857;
+  font-size:8px;font-weight:900;letter-spacing:.9px;
+  padding:3px 7px;border-radius:6px;
+}
+.qr-cap{text-align:center;margin-top:12px}
+.qr-cap .t{font-size:12.5px;font-weight:800}
+.qr-cap .s{font-size:10.5px;color:var(--text-faint);font-weight:600;margin-top:3px;line-height:1.5}
+
+.scan-wrap{
+  position:relative;width:100%;aspect-ratio:1/1;max-width:300px;margin:0 auto 12px;
+  border-radius:18px;overflow:hidden;background:#000;
+  border:1px solid var(--border);
+}
+.scan-wrap video{width:100%;height:100%;object-fit:cover;display:block}
+.scan-frame{
+  position:absolute;inset:16%;border-radius:16px;
+  box-shadow:0 0 0 9999px rgba(0,0,0,.45);
+  border:2px solid rgba(255,255,255,.85);
+}
+.scan-frame::before,.scan-frame::after{
+  content:"";position:absolute;width:26px;height:26px;
+  border:3px solid var(--accent-2);
+}
+.scan-frame::before{top:-2px;left:-2px;border-right:none;border-bottom:none;border-radius:8px 0 0 0}
+.scan-frame::after{bottom:-2px;right:-2px;border-left:none;border-top:none;border-radius:0 0 8px 0}
+.scan-line{
+  position:absolute;left:16%;right:16%;height:2px;
+  background:linear-gradient(90deg,transparent,var(--accent-2),transparent);
+  animation:scanline 2.1s ease-in-out infinite;
+  border-radius:2px;
+}
+@keyframes scanline{0%,100%{top:18%}50%{top:80%}}
+html.no-anim .scan-line{animation:none;top:50%}
+
+/* ---------- Toggle switch ---------- */
+.toggle-row{
+  display:flex;align-items:center;gap:12px;
+  padding:13px 0;border-bottom:1px solid var(--border);
+}
+.toggle-row:last-child{border-bottom:none}
+.toggle-row .tr-ico{
+  width:34px;height:34px;border-radius:11px;flex:none;
+  background:var(--surface-2);color:var(--text-dim);
+  display:grid;place-items:center;
+}
+.toggle-row .tr-mid{flex:1;min-width:0}
+.toggle-row .tr-t{font-size:13px;font-weight:750}
+.toggle-row .tr-s{font-size:10.5px;color:var(--text-faint);font-weight:600;margin-top:2px;line-height:1.4}
+.switch{
+  width:46px;height:27px;border-radius:99px;flex:none;
+  background:var(--surface-3);border:1px solid var(--border);
+  position:relative;transition:background .24s;
+}
+.switch::after{
+  content:"";position:absolute;top:2.5px;left:2.5px;
+  width:20px;height:20px;border-radius:50%;background:#fff;
+  box-shadow:0 1px 4px rgba(0,0,0,.28);
+  transition:transform .24s cubic-bezier(.3,1.4,.5,1);
+}
+.switch.on{background:var(--accent);border-color:var(--accent)}
+.switch.on::after{transform:translateX(19px)}
+
+/* ---------- Menu list ---------- */
+.menu-list{display:flex;flex-direction:column;gap:8px}
+.menu-item{
+  display:flex;align-items:center;gap:12px;width:100%;text-align:left;
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:15px;padding:12px;
+  box-shadow:var(--shadow-sm);
+  transition:transform .16s, background .2s;
+}
+.menu-item:active{transform:scale(.98);background:var(--surface-2)}
+.menu-item .mi-ico{
+  width:36px;height:36px;border-radius:11px;flex:none;
+  display:grid;place-items:center;
+  background:var(--accent-soft);color:var(--accent);
+}
+.menu-item .mi-ico.danger{background:var(--danger-soft);color:var(--danger)}
+.menu-item .mi-ico.success{background:var(--success-soft);color:var(--success)}
+.menu-item .mi-ico.warn{background:#FFF3E0;color:#E08800}
+html[data-theme="dark"] .menu-item .mi-ico.warn{background:#2A2110;color:#F5A623}
+.menu-item .mi-mid{flex:1;min-width:0}
+.menu-item .mi-t{font-size:13px;font-weight:750}
+.menu-item .mi-s{font-size:10.5px;color:var(--text-faint);font-weight:600;margin-top:2px}
+.menu-item .mi-arrow{color:var(--text-faint);flex:none}
+
+/* ---------- Avatar ---------- */
+.avatar{
+  width:72px;height:72px;border-radius:24px;flex:none;
+  display:grid;place-items:center;
+  background:linear-gradient(135deg,var(--accent),var(--accent-2));
+  color:#fff;font-size:26px;font-weight:850;letter-spacing:-1px;
+  box-shadow:0 10px 24px -12px rgba(91,75,255,.9);
+  overflow:hidden;
+  background-size:cover;background-position:center;
+}
+.avatar.lg{width:84px;height:84px;border-radius:28px;font-size:30px}
+
+/* ---------- Bottom nav ---------- */
+.bottomnav{
+  position:fixed;bottom:0;left:50%;transform:translateX(-50%);
+  width:100%;max-width:480px;z-index:70;
+  height:calc(var(--nav-h) + env(safe-area-inset-bottom));
+  padding-bottom:env(safe-area-inset-bottom);
+  background:color-mix(in srgb, var(--surface) 92%, transparent);
+  backdrop-filter:saturate(180%) blur(18px);
+  -webkit-backdrop-filter:saturate(180%) blur(18px);
+  border-top:1px solid var(--border);
+  display:flex;align-items:center;
+  box-shadow:0 -6px 24px -14px rgba(0,0,0,.3);
+}
+.nav-item{
+  flex:1;display:flex;flex-direction:column;align-items:center;gap:3px;
+  color:var(--text-faint);font-size:9.5px;font-weight:750;
+  padding:8px 2px;height:100%;justify-content:center;
+  transition:color .2s, transform .16s;
+  letter-spacing:-.1px;
+}
+.nav-item:active{transform:scale(.92)}
+.nav-item.on{color:var(--accent)}
+.nav-item .ic-wrap{transition:transform .24s cubic-bezier(.3,1.4,.5,1)}
+.nav-item.on .ic-wrap{transform:translateY(-1px)}
+.nav-qr{flex:1;position:relative}
+.nav-qr .qr-btn{
+  width:50px;height:50px;border-radius:17px;margin-top:-24px;
+  display:grid;place-items:center;color:#fff;
+  background:linear-gradient(135deg,var(--accent),#7C6BFF 55%,var(--accent-2) 150%);
+  box-shadow:0 12px 24px -10px rgba(91,75,255,1), 0 0 0 4px var(--surface);
+  transition:transform .2s cubic-bezier(.3,1.5,.5,1);
+}
+.nav-qr:active .qr-btn{transform:scale(.9)}
+.nav-qr .lbl{font-size:9.5px;font-weight:800;color:var(--text-faint);margin-top:2px}
+.nav-qr.on .lbl{color:var(--accent)}
+
+/* ---------- Toast ---------- */
+#toastRoot{
+  position:fixed;top:calc(env(safe-area-inset-top) + 64px);
+  left:50%;transform:translateX(-50%);
+  z-index:3000;display:flex;flex-direction:column;gap:8px;
+  align-items:center;pointer-events:none;width:calc(100% - 32px);max-width:420px;
+}
+.toast{
+  display:flex;align-items:center;gap:9px;
+  background:var(--surface);color:var(--text);
+  border:1px solid var(--border);
+  border-radius:14px;padding:11px 14px;
+  font-size:12px;font-weight:700;
+  box-shadow:var(--shadow-lg);
+  opacity:0;transform:translateY(-14px) scale(.96);
+  transition:all .3s cubic-bezier(.22,.9,.3,1);
+  max-width:100%;
+}
+.toast.show{opacity:1;transform:none}
+.toast .ic-wrap{flex:none;color:var(--accent)}
+.toast.success .ic-wrap{color:var(--success)}
+.toast.error .ic-wrap{color:var(--danger)}
+
+/* ---------- Misc ---------- */
+.hint{
+  font-size:10.5px;color:var(--text-faint);font-weight:600;line-height:1.55;
+  text-align:center;padding:8px 4px 2px;
+}
+.divider{height:1px;background:var(--border);margin:14px 0}
+.small-note{font-size:10px;color:var(--text-faint);font-weight:650;line-height:1.5}
+.center{text-align:center}
+.mt8{margin-top:8px}.mt12{margin-top:12px}.mt16{margin-top:16px}.mb8{margin-bottom:8px}
+.mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:11px;letter-spacing:-.2px}
+.badge{
+  display:inline-flex;align-items:center;gap:4px;
+  font-size:9px;font-weight:900;letter-spacing:.7px;
+  padding:3px 7px;border-radius:6px;text-transform:uppercase;
+}
+.badge.demo{background:#FFC857;color:#1A1405}
+.badge.sim{background:var(--accent-soft);color:var(--accent)}
+.badge.ok{background:var(--success-soft);color:var(--success)}
+.badge.red{background:var(--danger-soft);color:var(--danger)}
+
+.footer-brand{
+  text-align:center;padding:22px 10px 10px;
+  color:var(--text-faint);
+}
+.footer-brand .fb-1{font-size:12px;font-weight:800;color:var(--text-dim);letter-spacing:-.2px}
+.footer-brand .fb-2{font-size:10px;font-weight:650;margin-top:4px}
+.footer-brand .fb-3{font-size:9.5px;font-weight:700;letter-spacing:.7px;margin-top:8px;color:var(--accent)}
+
+.search-wrap{position:relative;margin-bottom:11px}
+.search-wrap .ic-wrap{
+  position:absolute;left:13px;top:50%;transform:translateY(-50%);
+  color:var(--text-faint);pointer-events:none;
+}
+.search-wrap .input{padding-left:40px;font-size:13px}
+
+.filter-bar{display:flex;gap:7px;margin-bottom:12px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}
+.filter-bar::-webkit-scrollbar{display:none}
+
+.notif-item{
+  display:flex;gap:11px;padding:12px;
+  border-radius:14px;background:var(--surface-2);
+  border:1px solid var(--border);margin-bottom:8px;
+}
+.notif-item.unread{background:var(--accent-soft);border-color:color-mix(in srgb,var(--accent) 26%,transparent)}
+.notif-item .ni-ico{
+  width:34px;height:34px;border-radius:11px;flex:none;
+  background:var(--surface);color:var(--accent);display:grid;place-items:center;
+  border:1px solid var(--border);
+}
+.notif-item .ni-t{font-size:12.5px;font-weight:800;letter-spacing:-.1px}
+.notif-item .ni-b{font-size:11px;color:var(--text-dim);font-weight:600;margin-top:3px;line-height:1.5}
+.notif-item .ni-time{font-size:9.5px;color:var(--text-faint);font-weight:700;margin-top:5px}
+
+@media(max-width:360px){
+  .bc-amount{font-size:26px}
+  .shortcut span{font-size:8.8px}
+  .stat-box .vl{font-size:12.5px}
+}
+</style>
+</head>
+<body>
+
+<div class="app">
+  <div class="sticky-top">
+    <div class="demo-bar">DEMO — NOT A REAL PAYMENT APP</div>
+    <header class="topbar">
+      <button class="icon-btn" id="btnBack" hidden aria-label="Kembali"><i class="ic-wrap" data-ic="arrowLeft"></i></button>
+      <div class="brand">
+        <div class="brand-mark">G</div>
+        <div class="brand-txt">
+          <span class="brand-name">G-Wallet <em>DEMO</em></span>
+          <span class="brand-sub">Powered by Xtan</span>
+        </div>
+      </div>
+      <button class="icon-btn" id="btnNotif" aria-label="Notifikasi">
+        <i class="ic-wrap" data-ic="bell"></i>
+        <span class="dot" id="notifDot"></span>
+      </button>
+    </header>
+  </div>
+
+  <main id="main">
+
+    <!-- ============ HOME ============ -->
+    <section class="page active" id="page-home">
+      <div class="balance-card">
+        <div class="bc-top">
+          <div class="bc-label">Saldo Demo</div>
+          <button class="bc-eye" id="btnEye" aria-label="Tampilkan atau sembunyikan saldo">
+            <i class="ic-wrap" data-ic="eye"></i>
+          </button>
+        </div>
+        <div class="bc-amount" id="balHome">Rp 0</div>
+        <div class="bc-meta">
+          <span class="bc-pill"><i class="ic-wrap" data-ic="shield" data-size="10"></i> SIMULASI</span>
+          <span>Tidak ada uang sungguhan</span>
+        </div>
+        <div class="bc-actions">
+          <button class="bc-act" data-act="topup"><span class="ic-wrap"><i class="ic-wrap" data-ic="plus" data-size="16"></i></span>Top Up</button>
+          <button class="bc-act" data-act="transfer"><span class="ic-wrap"><i class="ic-wrap" data-ic="send" data-size="16"></i></span>Transfer</button>
+          <button class="bc-act" data-act="qr"><span class="ic-wrap"><i class="ic-wrap" data-ic="qr" data-size="16"></i></span>QR Demo</button>
+          <button class="bc-act" data-act="history"><span class="ic-wrap"><i class="ic-wrap" data-ic="clock" data-size="16"></i></span>Riwayat</button>
+        </div>
+      </div>
+
+      <div class="sec-head"><h3>Layanan Demo</h3></div>
+      <div class="shortcut-grid" id="shortcutGrid"></div>
+
+      <div class="sec-head"><h3>Promo Demo</h3><button data-act="promos">Lihat semua</button></div>
+      <div class="promo-scroll" id="promoScroll"></div>
+
+      <div class="sec-head"><h3>Statistik Saldo</h3><button data-act="wallet">Detail</button></div>
+      <div class="stat-row" id="statRow"></div>
+      <div class="card" style="margin-top:12px">
+        <div class="chart" id="homeChart"></div>
+        <div class="chart-legend">
+          <span><i style="background:var(--success)"></i>Masuk</span>
+          <span><i style="background:var(--danger)"></i>Keluar</span>
+        </div>
+      </div>
+
+      <div class="sec-head"><h3>Transaksi Terakhir</h3><button data-act="history">Semua</button></div>
+      <div class="tx-list" id="homeTxList"></div>
+    </section>
+
+    <!-- ============ WALLET ============ -->
+    <section class="page" id="page-wallet">
+      <div class="page-head">
+        <div>
+          <h2>Wallet</h2>
+          <p>Ringkasan saldo &amp; aktivitas demo</p>
+        </div>
+      </div>
+
+      <div class="balance-card">
+        <div class="bc-top">
+          <div class="bc-label">Saldo Saat Ini</div>
+          <button class="bc-eye" id="btnEye2" aria-label="Tampilkan atau sembunyikan saldo">
+            <i class="ic-wrap" data-ic="eye"></i>
+          </button>
+        </div>
+        <div class="bc-amount" id="balWallet">Rp 0</div>
+        <div class="bc-meta">
+          <span class="bc-pill"><i class="ic-wrap" data-ic="shield" data-size="10"></i> SIMULASI</span>
+          <span>Saldo awal <b id="initBalTxt">Rp 0</b></span>
+        </div>
+        <div class="bc-actions">
+          <button class="bc-act" data-act="topup"><span class="ic-wrap"><i class="ic-wrap" data-ic="plus" data-size="16"></i></span>Top Up</button>
+          <button class="bc-act" data-act="transfer"><span class="ic-wrap"><i class="ic-wrap" data-ic="send" data-size="16"></i></span>Transfer</button>
+          <button class="bc-act" data-act="qr"><span class="ic-wrap"><i class="ic-wrap" data-ic="qr" data-size="16"></i></span>QR Demo</button>
+          <button class="bc-act" data-act="setInit"><span class="ic-wrap"><i class="ic-wrap" data-ic="sliders" data-size="16"></i></span>Saldo Awal</button>
+        </div>
+      </div>
+
+      <div class="stat-row" id="walletStatRow"></div>
+
+      <div class="card">
+        <div class="sec-head" style="margin:0 0 4px"><h3>Aktivitas 7 Hari</h3></div>
+        <div class="chart" id="walletChart"></div>
+        <div class="chart-legend">
+          <span><i style="background:var(--success)"></i>Masuk</span>
+          <span><i style="background:var(--danger)"></i>Keluar</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="sec-head" style="margin:0 0 10px"><h3>Aksi Cepat</h3></div>
+        <div class="menu-list">
+          <button class="menu-item" data-act="topup">
+            <span class="mi-ico"><i class="ic-wrap" data-ic="plus"></i></span>
+            <span class="mi-mid"><span class="mi-t">Top Up Demo</span><span class="mi-s">Tambah saldo simulasi</span></span>
+            <i class="ic-wrap mi-arrow" data-ic="chevronRight" data-size="16"></i>
+          </button>
+          <button class="menu-item" data-act="transfer">
+            <span class="mi-ico"><i class="ic-wrap" data-ic="send"></i></span>
+            <span class="mi-mid"><span class="mi-t">Transfer Demo</span><span class="mi-s">Kirim saldo ke nomor fiktif</span></span>
+            <i class="ic-wrap mi-arrow" data-ic="chevronRight" data-size="16"></i>
+          </button>
+          <button class="menu-item" data-act="pulsa">
+            <span class="mi-ico warn"><i class="ic-wrap" data-ic="phone"></i></span>
+            <span class="mi-mid"><span class="mi-t">Pulsa Demo</span><span class="mi-s">Beli pulsa simulasi</span></span>
+            <i class="ic-wrap mi-arrow" data-ic="chevronRight" data-size="16"></i>
+          </button>
+          <button class="menu-item" data-act="tagihan">
+            <span class="mi-ico success"><i class="ic-wrap" data-ic="receipt"></i></span>
+            <span class="mi-mid"><span class="mi-t">Tagihan Demo</span><span class="mi-s">Bayar tagihan simulasi</span></span>
+            <i class="ic-wrap mi-arrow" data-ic="chevronRight" data-size="16"></i>
+          </button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="sim-banner">
+          <i class="ic-wrap" data-ic="info" data-size="18"></i>
+          <span>SIMULASI SAJA — Tidak ada uang sungguhan yang diproses.</span>
+        </div>
+        <p class="small-note">Seluruh saldo, transaksi, dan nomor tujuan adalah data fiktif yang disimpan di perangkat kamu (localStorage). G-Wallet Demo tidak terhubung ke sistem pembayaran mana pun.</p>
+      </div>
+    </section>
+
+    <!-- ============ QR ============ -->
+    <section class="page" id="page-qr">
+      <div class="page-head">
+        <div>
+          <h2>QR Demo</h2>
+          <p>Kode QR simulasi — tidak terhubung ke pembayaran</p>
+        </div>
+      </div>
+
+      <div class="chips mb8">
+        <button class="chip on" id="qrTabGen">Terima (Generate)</button>
+        <button class="chip" id="qrTabScan">Scan QR</button>
+      </div>
+
+      <div id="qrPaneGen">
+        <div class="card">
+          <div class="qr-frame" id="qrFrame">
+            <div class="qr-watermark">DEMO QR</div>
+          </div>
+          <div class="qr-cap">
+            <div class="t" id="qrTitle">Merchant Demo</div>
+            <div class="s" id="qrSub">QR simulasi · tidak dapat digunakan untuk pembayaran nyata</div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="field">
+            <label>Nama Merchant / Penerima (fiktif)</label>
+            <input class="input" id="qrName" type="text" value="Merchant Demo" maxlength="32" placeholder="Contoh: Kedai Demo">
+          </div>
+          <div class="field">
+            <label>Nominal (opsional)</label>
+            <div class="input-prefix">
+              <span class="pfx">Rp</span>
+              <input class="input" id="qrAmount" type="text" inputmode="numeric" placeholder="0">
+            </div>
+          </div>
+          <div class="field">
+            <label>Catatan (opsional)</label>
+            <input class="input" id="qrNote" type="text" maxlength="48" placeholder="Contoh: Pesanan simulasi">
+          </div>
+          <button class="btn btn-primary full" id="qrRefresh"><i class="ic-wrap" data-ic="refresh" data-size="16"></i> Perbarui QR Demo</button>
+        </div>
+
+        <div class="card">
+          <div class="sim-banner">
+            <i class="ic-wrap" data-ic="info" data-size="18"></i>
+            <span>SIMULASI SAJA — Tidak ada uang sungguhan yang diproses.</span>
+          </div>
+          <p class="small-note">QR ini dihasilkan secara lokal di browser kamu dan hanya berisi data teks demo. Tidak ada koneksi ke payment gateway, bank, atau penyedia QRIS mana pun.</p>
+        </div>
+      </div>
+
+      <div id="qrPaneScan" hidden>
+        <div class="card">
+          <div class="scan-wrap" id="scanWrap" style="display:none">
+            <video id="scanVideo" playsinline muted autoplay></video>
+            <div class="scan-frame"></div>
+            <div class="scan-line"></div>
+          </div>
+          <div id="scanIdle" class="center" style="padding:20px 6px">
+            <div class="eico" style="width:70px;height:70px;border-radius:22px;background:var(--accent-soft);color:var(--accent);display:grid;place-items:center;margin:0 auto 14px">
+              <i class="ic-wrap" data-ic="camera" data-size="30"></i>
+            </div>
+            <h4 style="font-size:14px;font-weight:800;margin-bottom:6px">Scan QR Demo</h4>
+            <p class="small-note" style="max-width:280px;margin:0 auto 14px">Gunakan kamera untuk membaca QR demo, atau masukkan kode demo secara manual.</p>
+            <button class="btn btn-primary full" id="btnStartScan"><i class="ic-wrap" data-ic="camera" data-size="16"></i> Mulai Kamera</button>
+            <button class="btn btn-ghost full mt8" id="btnManualScan"><i class="ic-wrap" data-ic="keyboard" data-size="16"></i> Input Kode Manual</button>
+          </div>
+          <div id="scanStatus" class="hint"></div>
+        </div>
+
+        <div class="card">
+          <div class="sim-banner">
+            <i class="ic-wrap" data-ic="info" data-size="18"></i>
+            <span>SIMULASI SAJA — Tidak ada uang sungguhan yang diproses.</span>
+          </div>
+          <p class="small-note">Pemindaian menggunakan kamera perangkat dan hanya membaca teks QR demo. Tidak ada data yang dikirim ke server mana pun.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ ACTIVITY ============ -->
+    <section class="page" id="page-activity">
+      <div class="page-head">
+        <div>
+          <h2>Activity</h2>
+          <p>Riwayat transaksi simulasi</p>
+        </div>
+      </div>
+
+      <div class="search-wrap">
+        <i class="ic-wrap" data-ic="search" data-size="17"></i>
+        <input class="input" id="txSearch" type="text" placeholder="Cari transaksi, catatan, ID...">
+      </div>
+
+      <div class="filter-bar">
+        <button class="chip on" data-filter="all">Semua</button>
+        <button class="chip" data-filter="in">Pemasukan</button>
+        <button class="chip" data-filter="out">Pengeluaran</button>
+        <button class="chip" data-filter="topup">Top Up</button>
+        <button class="chip" data-filter="transfer">Transfer</button>
+        <button class="chip" data-filter="qr">QR</button>
+      </div>
+
+      <div class="stat-row mb8" id="actStatRow"></div>
+
+      <div id="activityList"></div>
+    </section>
+
+    <!-- ============ PROFILE ============ -->
+    <section class="page" id="page-profile">
+      <div class="page-head">
+        <div>
+          <h2>Profile</h2>
+          <p>Data pengguna demo (lokal)</p>
+        </div>
+      </div>
+
+      <div class="card">
+        <div style="display:flex;align-items:center;gap:14px">
+          <div class="avatar lg" id="profAvatar">PD</div>
+          <div style="flex:1;min-width:0">
+            <div style="display:flex;align-items:center;gap:7px;flex-wrap:wrap">
+              <div style="font-size:16px;font-weight:850;letter-spacing:-.3px" id="profName">Pengguna Demo</div>
+              <span class="badge demo">DEMO</span>
+            </div>
+            <div class="small-note mt8" id="profId">GW-0001-DEMO</div>
+            <div class="small-note" id="profEmail">demo@xtan.local</div>
+          </div>
+        </div>
+        <div class="divider"></div>
+        <div class="btn-row">
+          <button class="btn btn-ghost" id="btnEditProfile"><i class="ic-wrap" data-ic="edit" data-size="16"></i> Edit Profil</button>
+          <button class="btn btn-ghost" id="btnChangeAvatar"><i class="ic-wrap" data-ic="camera" data-size="16"></i> Avatar</button>
+        </div>
+      </div>
+
+      <div class="stat-row mb8" id="profStatRow"></div>
+
+      <div class="menu-list">
+        <button class="menu-item" data-act="promos">
+          <span class="mi-ico"><i class="ic-wrap" data-ic="gift"></i></span>
+          <span class="mi-mid"><span class="mi-t">Promo Demo</span><span class="mi-s">4 promo fiktif untuk demonstrasi</span></span>
+          <i class="ic-wrap mi-arrow" data-ic="chevronRight" data-size="16"></i>
+        </button>
+        <button class="menu-item" data-act="settings">
+          <span class="mi-ico"><i class="ic-wrap" data-ic="sliders"></i></span>
+          <span class="mi-mid"><span class="mi-t">Pengaturan</span><span class="mi-s">Tema, animasi, data</span></span>
+          <i class="ic-wrap mi-arrow" data-ic="chevronRight" data-size="16"></i>
+        </button>
+        <button class="menu-item" data-act="admin">
+          <span class="mi-ico warn"><i class="ic-wrap" data-ic="bolt"></i></span>
+          <span class="mi-mid"><span class="mi-t">Panel Admin / Demo</span><span class="mi-s">Kontrol penuh simulator</span></span>
+          <i class="ic-wrap mi-arrow" data-ic="chevronRight" data-size="16"></i>
+        </button>
+        <button class="menu-item" data-act="notifs">
+          <span class="mi-ico"><i class="ic-wrap" data-ic="bell"></i></span>
+          <span class="mi-mid"><span class="mi-t">Notifikasi Demo</span><span class="mi-s" id="notifCountTxt">0 pesan</span></span>
+          <i class="ic-wrap mi-arrow" data-ic="chevronRight" data-size="16"></i>
+        </button>
+        <button class="menu-item" data-act="about">
+          <span class="mi-ico success"><i class="ic-wrap" data-ic="info"></i></span>
+          <span class="mi-mid"><span class="mi-t">Tentang Aplikasi</span><span class="mi-s">G-Wallet Demo · Powered by Xtan</span></span>
+          <i class="ic-wrap mi-arrow" data-ic="chevronRight" data-size="16"></i>
+        </button>
+      </div>
+
+      <div class="footer-brand">
+        <div class="fb-1">G-Wallet Demo</div>
+        <div class="fb-2">Powered by Xtan</div>
+        <div class="fb-3">UI SIMULATION ONLY</div>
+      </div>
+    </section>
+
+    <!-- ============ PROMOS ============ -->
+    <section class="page" id="page-promos">
+      <div class="page-head">
+        <div>
+          <h2>Promo Demo</h2>
+          <p>Seluruh promo bersifat fiktif</p>
+        </div>
+      </div>
+      <div class="sim-banner">
+        <i class="ic-wrap" data-ic="info" data-size="18"></i>
+        <span>Promo demo — bukan penawaran nyata, tidak dapat diklaim di dunia nyata.</span>
+      </div>
+      <div id="promoList"></div>
+      <div class="footer-brand">
+        <div class="fb-1">G-Wallet Demo</div>
+        <div class="fb-2">Powered by Xtan</div>
+        <div class="fb-3">UI SIMULATION ONLY</div>
+      </div>
+    </section>
+
+    <!-- ============ SETTINGS ============ -->
+    <section class="page" id="page-settings">
+      <div class="page-head">
+        <div>
+          <h2>Pengaturan</h2>
+          <p>Preferensi tampilan &amp; data lokal</p>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="toggle-row">
+          <span class="tr-ico"><i class="ic-wrap" data-ic="moon" data-size="18"></i></span>
+          <span class="tr-mid"><span class="tr-t">Mode Gelap</span><span class="tr-s">Tema gelap untuk mata nyaman</span></span>
+          <button class="switch" id="swDark" role="switch" aria-label="Mode gelap"></button>
+        </div>
+        <div class="toggle-row">
+          <span class="tr-ico"><i class="ic-wrap" data-ic="bolt" data-size="18"></i></span>
+          <span class="tr-mid"><span class="tr-t">Animasi</span><span class="tr-s">Transisi &amp; micro-animation</span></span>
+          <button class="switch" id="swAnim" role="switch" aria-label="Animasi"></button>
+        </div>
+        <div class="toggle-row">
+          <span class="tr-ico"><i class="ic-wrap" data-ic="sparkle" data-size="18"></i></span>
+          <span class="tr-mid"><span class="tr-t">Efek Visual</span><span class="tr-s">Bayangan, gradient, dan glass effect</span></span>
+          <button class="switch" id="swFx" role="switch" aria-label="Efek visual"></button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="sec-head" style="margin:0 0 10px"><h3>Kelola Data</h3></div>
+        <div class="menu-list">
+          <button class="menu-item" id="btnExport">
+            <span class="mi-ico success"><i class="ic-wrap" data-ic="download"></i></span>
+            <span class="mi-mid"><span class="mi-t">Export JSON</span><span class="mi-s">Unduh seluruh data simulasi</span></span>
+            <i class="ic-wrap mi-arrow" data-ic="chevronRight" data-size="16"></i>
+          </button>
+          <button class="menu-item" id="btnImport">
+            <span class="mi-ico"><i class="ic-wrap" data-ic="upload"></i></span>
+            <span class="mi-mid"><span class="mi-t">Import JSON</span><span class="mi-s">Pulihkan data dari file</span></span>
+            <i class="ic-wrap mi-arrow" data-ic="chevronRight" data-size="16"></i>
+          </button>
+          <button class="menu-item" id="btnResetBal">
+            <span class="mi-ico warn"><i class="ic-wrap" data-ic="refresh"></i></span>
+            <span class="mi-mid"><span class="mi-t">Reset Saldo</span><span class="mi-s">Kembalikan ke saldo awal</span></span>
+            <i class="ic-wrap mi-arrow" data-ic="chevronRight" data-size="16"></i>
+          </button>
+          <button class="menu-item" id="btnResetTx">
+            <span class="mi-ico warn"><i class="ic-wrap" data-ic="trash"></i></span>
+            <span class="mi-mid"><span class="mi-t">Reset Transaksi</span><span class="mi-s">Hapus seluruh riwayat</span></span>
+            <i class="ic-wrap mi-arrow" data-ic="chevronRight" data-size="16"></i>
+          </button>
+          <button class="menu-item" id="btnResetAll">
+            <span class="mi-ico danger"><i class="ic-wrap" data-ic="alert"></i></span>
+            <span class="mi-mid"><span class="mi-t">Reset Seluruh Data</span><span class="mi-s">Hapus semua data &amp; muat ulang</span></span>
+            <i class="ic-wrap mi-arrow" data-ic="chevronRight" data-size="16"></i>
+          </button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="sim-banner">
+          <i class="ic-wrap" data-ic="shield" data-size="18"></i>
+          <span>Data disimpan hanya di localStorage perangkat ini. Tidak ada server, tidak ada pelacakan.</span>
+        </div>
+      </div>
+
+      <div class="footer-brand">
+        <div class="fb-1">G-Wallet Demo</div>
+        <div class="fb-2">Powered by Xtan</div>
+        <div class="fb-3">UI SIMULATION ONLY</div>
+      </div>
+    </section>
+
+    <!-- ============ ADMIN ============ -->
+    <section class="page" id="page-admin">
+      <div class="page-head">
+        <div>
+          <h2>Panel Admin / Demo</h2>
+          <p>Kontrol simulator untuk pengembang</p>
+        </div>
+      </div>
+
+      <div class="sim-banner">
+        <i class="ic-wrap" data-ic="bolt" data-size="18"></i>
+        <span>Panel ini hanya mengubah data simulasi lokal. Tidak ada transaksi nyata.</span>
+      </div>
+
+      <div class="card">
+        <div class="sec-head" style="margin:0 0 10px"><h3>Saldo Simulator</h3></div>
+        <div class="field">
+          <label>Set Saldo (Rp)</label>
+          <div class="input-prefix">
+            <span class="pfx">Rp</span>
+            <input class="input" id="admBalance" type="text" inputmode="numeric" placeholder="0">
+          </div>
+        </div>
+        <div class="chips mb8" id="admQuickBal"></div>
+        <div class="btn-row">
+          <button class="btn btn-primary" id="admSetBal"><i class="ic-wrap" data-ic="check" data-size="16"></i> Set Saldo</button>
+          <button class="btn btn-ghost" id="admAddBal"><i class="ic-wrap" data-ic="plus" data-size="16"></i> Tambah</button>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="sec-head" style="margin:0 0 10px"><h3>Tambah Transaksi Dummy</h3></div>
+        <div class="field">
+          <label>Judul</label>
+          <input class="input" id="admTxTitle" type="text" placeholder="Contoh: Pembelian Demo">
+        </div>
+        <div class="field">
+          <label>Arah</label>
+          <select class="input" id="admTxDir">
+            <option value="out">Pengeluaran (saldo berkurang)</option>
+            <option value="in">Pemasukan (saldo bertambah)</option>
+          </select>
+        </div>
+        <div class="field">
+          <label>Nominal</label>
+          <div class="input-prefix">
+            <span class="pfx">Rp</span>
+            <input class="input" id="admTxAmount" type="text" inputmode="numeric" placeholder="0">
+          </div>
+        </div>
+        <button class="btn btn-primary full" id="admAddTx"><i class="ic-wrap" data-ic="plus" data-size="16"></i> Tambah Transaksi</button>
+      </div>
+
+      <div class="card">
+        <div class="sec-head" style="margin:0 0 10px"><h3>Generator &amp; Reset</h3></div>
+        <div class="field">
+          <label>Jumlah transaksi random</label>
+          <select class="input" id="admGenCount">
+            <option value="5">5 transaksi</option>
+            <option value="10" selected>10 transaksi</option>
+            <option value="20">20 transaksi</option>
+            <option value="50">50 transaksi</option>
+          </select>
+        </div>
+        <button class="btn btn-soft full mb8" id="admGen"><i class="ic-wrap" data-ic="sparkle" data-size="16"></i> Generate Transaksi Random</button>
+        <button class="btn btn-ghost full mb8" id="admSeed"><i class="ic-wrap" data-ic="gift" data-size="16"></i> Muat Data Contoh Awal</button>
+        <button class="btn btn-danger full" id="admReset"><i class="ic-wrap" data-ic="refresh" data-size="16"></i> Reset Simulator</button>
+      </div>
+
+      <div class="card">
+        <div class="sec-head" style="margin:0 0 10px"><h3>Identitas Demo</h3></div>
+        <div class="field">
+          <label>Nama Pengguna</label>
+          <input class="input" id="admName" type="text" maxlength="24" placeholder="Pengguna Demo">
+        </div>
+        <div class="field">
+          <label>ID Pengguna (fiktif)</label>
+          <input class="input" id="admId" type="text" maxlength="20" placeholder="GW-0001-DEMO">
+        </div>
+        <div class="field">
+          <label>Tema</label>
+          <select class="input" id="admTheme">
+            <option value="light">Light</option>
+            <option value="dark">Dark</option>
+          </select>
+        </div>
+        <button class="btn btn-primary full" id="admSaveId"><i class="ic-wrap" data-ic="check" data-size="16"></i> Simpan</button>
+      </div>
+
+      <div class="card">
+        <div class="sec-head" style="margin:0 0 10px"><h3>Ringkasan Data</h3></div>
+        <div id="admSummary"></div>
+        <div class="btn-row mt12">
+          <button class="btn btn-ghost" id="admExport"><i class="ic-wrap" data-ic="download" data-size="16"></i> Export</button>
+          <button class="btn btn-danger" id="admClearTx"><i class="ic-wrap" data-ic="trash" data-size="16"></i> Hapus Semua Tx</button>
+        </div>
+      </div>
+
+      <div class="footer-brand">
+        <div class="fb-1">G-Wallet Demo</div>
+        <div class="fb-2">Powered by Xtan</div>
+        <div class="fb-3">UI SIMULATION ONLY</div>
+      </div>
+    </section>
+
+  </main>
+
+  <nav class="bottomnav" id="bottomnav">
+    <button class="nav-item on" data-nav="home"><i class="ic-wrap" data-ic="home" data-size="21"></i><span>Home</span></button>
+    <button class="nav-item" data-nav="wallet"><i class="ic-wrap" data-ic="wallet" data-size="21"></i><span>Wallet</span></button>
+    <button class="nav-item nav-qr" data-nav="qr">
+      <span class="qr-btn"><i class="ic-wrap" data-ic="qr" data-size="22"></i></span>
+      <span class="lbl">QR Demo</span>
+    </button>
+    <button class="nav-item" data-nav="activity"><i class="ic-wrap" data-ic="pulse" data-size="21"></i><span>Activity</span></button>
+    <button class="nav-item" data-nav="profile"><i class="ic-wrap" data-ic="user" data-size="21"></i><span>Profile</span></button>
+  </nav>
+</div>
+
+<div id="sheetRoot"></div>
+<div id="toastRoot"></div>
+<input type="file" id="fileImport" accept="application/json,.json" hidden>
+
+<script>
+/* =============================================================
+   G-WALLET DEMO — Powered by Xtan
+   Simulator dompet digital (UI/UX & pembelajaran).
+   100% front-end. Data di localStorage. Tidak ada pembayaran nyata.
+   ============================================================= */
+(function(){
+'use strict';
+
+/* -------------------------------------------------------------
+   1. ICONS (original, stroke-based SVG)
+   ------------------------------------------------------------- */
+const ICONS = {
+  home:'<path d="M4 10.4 12 4l8 6.4V20a1 1 0 0 1-1 1h-4.2v-6.2H9.2V21H5a1 1 0 0 1-1-1z"/>',
+  wallet:'<path d="M4 7.6A2.6 2.6 0 0 1 6.6 5H17a2 2 0 0 1 2 2v1.1"/><rect x="4" y="7" width="16" height="12.4" rx="2.6"/><circle cx="16.2" cy="13.2" r="1.3" fill="currentColor" stroke="none"/>',
+  qr:'<rect x="3" y="3" width="7" height="7" rx="1.8"/><rect x="14" y="3" width="7" height="7" rx="1.8"/><rect x="3" y="14" width="7" height="7" rx="1.8"/><path d="M14 14h3.2v3.2H14zM20.8 14v1.2M14 20.8h3.2M19.4 19.4l1.4 1.4"/>',
+  pulse:'<path d="M3 12.5h3.6l2.3-6.2 4.2 12 2.4-5.8H21"/>',
+  user:'<circle cx="12" cy="8.2" r="3.6"/><path d="M4.8 20.2a7.2 7.2 0 0 1 14.4 0"/>',
+  eye:'<path d="M2.2 12S5.8 6.2 12 6.2 21.8 12 21.8 12 18.2 17.8 12 17.8 2.2 12 2.2 12z"/><circle cx="12" cy="12" r="2.9"/>',
+  eyeOff:'<path d="M4 4l16 16"/><path d="M9.6 9.7A2.9 2.9 0 0 0 12 14.9c.72 0 1.38-.26 1.9-.7"/><path d="M6.3 6.6C3.8 8.3 2.2 12 2.2 12s3.6 5.8 9.8 5.8c1.6 0 3-.38 4.2-.98"/><path d="M10 6.4A9.9 9.9 0 0 1 12 6.2c6.2 0 9.8 5.8 9.8 5.8a17.6 17.6 0 0 1-2.6 3.2"/>',
+  plus:'<path d="M12 5v14M5 12h14"/>',
+  send:'<path d="M21 3 3.6 10.4l6.6 2.9 2.9 6.6z"/><path d="M21 3 10.2 13.3"/>',
+  clock:'<circle cx="12" cy="12" r="8.6"/><path d="M12 7.4V12l3.1 2"/>',
+  bell:'<path d="M6.2 9.6a5.8 5.8 0 1 1 11.6 0c0 3.9 1.6 5.4 1.6 5.4H4.6s1.6-1.5 1.6-5.4z"/><path d="M10 18.2a2.1 2.1 0 0 0 4 0"/>',
+  arrowLeft:'<path d="M15 5l-7 7 7 7"/>',
+  chevronRight:'<path d="M9.5 5l7 7-7 7"/>',
+  close:'<path d="M6 6l12 12M18 6L6 18"/>',
+  search:'<circle cx="11" cy="11" r="6.6"/><path d="M16 16l4.2 4.2"/>',
+  trash:'<path d="M4 7h16M9.2 7V4.8h5.6V7M6.4 7l1 13h9.2l1-13"/>',
+  edit:'<path d="M4 20.2h4.2L20.4 8 16.2 3.8 4 16z"/><path d="M14.4 5.6l4.2 4.2"/>',
+  check:'<path d="M5 12.8l4.6 4.6L19 6.6"/>',
+  sun:'<circle cx="12" cy="12" r="4"/><path d="M12 2.4v2.2M12 19.4v2.2M2.4 12h2.2M19.4 12h2.2M5.2 5.2l1.6 1.6M17.2 17.2l1.6 1.6M18.8 5.2l-1.6 1.6M6.8 17.2l-1.6 1.6"/>',
+  moon:'<path d="M20.4 14.6A8.6 8.6 0 0 1 9.4 3.6a8.6 8.6 0 1 0 11 11z"/>',
+  sliders:'<path d="M4 7.4h8.6M17.2 7.4H20M4 16.6h2.8M11.4 16.6H20"/><circle cx="15.2" cy="7.4" r="2.2"/><circle cx="9.4" cy="16.6" r="2.2"/>',
+  download:'<path d="M12 3.4v11.8M7.4 10.8 12 15.4l4.6-4.6M4.2 20.4h15.6"/>',
+  upload:'<path d="M12 15.4V3.6M7.4 8.2 12 3.6l4.6 4.6M4.2 20.4h15.6"/>',
+  refresh:'<path d="M20.4 12a8.4 8.4 0 1 1-2.5-6"/><path d="M20.4 3.8v4.4h-4.4"/>',
+  shield:'<path d="M12 3l7.2 2.9v5.9c0 4.6-3.1 8.2-7.2 9.2-4.1-1-7.2-4.6-7.2-9.2V5.9z"/><path d="M9.2 12l2 2 3.6-3.8"/>',
+  camera:'<path d="M4 8.8A2.2 2.2 0 0 1 6.2 6.6h1.4l1-1.8h6.8l1 1.8h1.4A2.2 2.2 0 0 1 20 8.8v8.4a2.2 2.2 0 0 1-2.2 2.2H6.2A2.2 2.2 0 0 1 4 17.2z"/><circle cx="12" cy="13" r="3.4"/>',
+  gift:'<rect x="3.2" y="8.2" width="17.6" height="12.6" rx="2.4"/><path d="M3.2 12.6h17.6M12 8.2v12.6"/><path d="M12 8.2S10.6 3.2 8.2 3.2a2.4 2.4 0 0 0 0 5M12 8.2s1.4-5 3.8-5a2.4 2.4 0 0 1 0 5"/>',
+  bolt:'<path d="M13.2 2.6 4.6 13.8h5.6l-1.4 7.6 8.6-11.2h-5.6z"/>',
+  phone:'<rect x="6.2" y="2.6" width="11.6" height="18.8" rx="2.6"/><path d="M10.6 18.2h2.8"/>',
+  cart:'<circle cx="9.4" cy="19.6" r="1.4"/><circle cx="17.6" cy="19.6" r="1.4"/><path d="M3 4.2h2.2L7.4 15h9.8L19.6 7.4H6"/>',
+  receipt:'<path d="M6.2 3.2h11.6v17.6l-2.9-1.9-2.9 1.9-2.9-1.9-2.9 1.9z"/><path d="M9.2 8h5.6M9.2 12h5.6"/>',
+  info:'<circle cx="12" cy="12" r="8.8"/><path d="M12 11.2v5M12 7.9h.01"/>',
+  sparkle:'<path d="M12 3.2l1.8 5.2 5.2 1.8-5.2 1.8L12 17.2l-1.8-5.2L5 10.2l5.2-1.8z"/><path d="M18.6 16.4l.8 2.2 2.2.8-2.2.8-.8 2.2-.8-2.2-2.2-.8 2.2-.8z"/>',
+  alert:'<path d="M12 3.4 21.4 20H2.6z"/><path d="M12 10v4.4M12 17.4h.01"/>',
+  keyboard:'<rect x="2.6" y="6.2" width="18.8" height="11.6" rx="2.4"/><path d="M6.4 10h.01M9.6 10h.01M12.8 10h.01M16 10h.01M8 14h8"/>',
+  filter:'<path d="M4 6.6h16M7.2 12h9.6M10.4 17.4h3.2"/>',
+  copy:'<rect x="8.6" y="8.6" width="11.8" height="11.8" rx="2.4"/><path d="M15.4 8.6V5.8a2.4 2.4 0 0 0-2.4-2.4H5.8a2.4 2.4 0 0 0-2.4 2.4v7.2a2.4 2.4 0 0 0 2.4 2.4h2.8"/>',
+  dice:'<rect x="3.4" y="3.4" width="17.2" height="17.2" rx="3.4"/><circle cx="8.6" cy="8.6" r="1.3" fill="currentColor" stroke="none"/><circle cx="15.4" cy="15.4" r="1.3" fill="currentColor" stroke="none"/><circle cx="12" cy="12" r="1.3" fill="currentColor" stroke="none"/>'
+};
+
+function svgIcon(name, size){
+  const s = size || 20;
+  return '<svg viewBox="0 0 24 24" width="'+s+'" height="'+s+'" fill="none" stroke="currentColor" stroke-width="1.85" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">'+(ICONS[name]||'')+'</svg>';
+}
+function hydrateIcons(root){
+  (root||document).querySelectorAll('[data-ic]').forEach(function(el){
+    if(el.dataset.hydrated) return;
+    const sz = parseInt(el.dataset.size||'20',10);
+    el.dataset.hydrated = '1';
+    el.innerHTML = svgIcon(el.dataset.ic, sz);
+  });
+}
+
+/* -------------------------------------------------------------
+   2. QR ENGINE (compact byte-mode QR, versions 1–10, EC level L)
+   ------------------------------------------------------------- */
+const QR = (function(){
+  const EXP = new Uint8Array(512), LOG = new Uint8Array(256);
+  (function(){
+    let x = 1;
+    for(let i=0;i<255;i++){ EXP[i]=x; LOG[x]=i; x <<= 1; if(x & 0x100) x ^= 0x11D; }
+    for(let i=255;i<512;i++) EXP[i] = EXP[i-255];
+  })();
+  const mul = function(a,b){ return (a===0||b===0) ? 0 : EXP[LOG[a]+LOG[b]]; };
+
+  function genPoly(deg){
+    let p = [1];
+    for(let i=0;i<deg;i++){
+      const n = new Array(p.length+1).fill(0);
+      for(let j=0;j<p.length;j++){
+        n[j]   ^= mul(p[j], EXP[i]);
+        n[j+1] ^= p[j];
+      }
+      p = n;
+    }
+    return p.reverse();
+  }
+
+  function rsEncode(data, ecLen){
+    const gen = genPoly(ecLen);
+    const res = new Uint8Array(data.length + ecLen);
+    res.set(data, 0);
+    for(let i=0;i<data.length;i++){
+      const c = res[i];
+      if(c !== 0){
+        for(let j=0;j<gen.length;j++) res[i+j] ^= mul(gen[j], c);
+      }
+    }
+    return Array.prototype.slice.call(res.subarray(data.length));
+  }
+
+  const RS = {
+    1:{ec:7, g:[[1,19]]}, 2:{ec:10, g:[[1,34]]}, 3:{ec:15, g:[[1,55]]},
+    4:{ec:20, g:[[1,80]]}, 5:{ec:26, g:[[1,108]]}, 6:{ec:18, g:[[2,68]]},
+    7:{ec:20, g:[[2,78]]}, 8:{ec:24, g:[[2,97]]}, 9:{ec:30, g:[[2,116]]},
+    10:{ec:18, g:[[2,68],[2,69]]}
+  };
+  const APOS = {1:[],2:[6,18],3:[6,22],4:[6,26],5:[6,30],6:[6,34],7:[6,22,38],8:[6,24,42],9:[6,26,46],10:[6,28,50]};
+
+  function bchVersion(v){
+    let d = v << 12;
+    for(let i=17;i>=12;i--){ if((d>>i)&1) d ^= 0x1F25 << (i-12); }
+    return ((v << 12) | (d & 0xFFF));
+  }
+  function bchFormat(data){
+    let d = data << 10;
+    for(let i=14;i>=10;i--){ if((d>>i)&1) d ^= 0x537 << (i-10); }
+    return (((data << 10) | (d & 0x3FF)) ^ 0x5412);
+  }
+
+  function makeCodewords(text){
+    const bytes = Array.prototype.slice.call(new TextEncoder().encode(text));
+    let version = 0, spec = null, dcTotal = 0;
+    for(let v=1; v<=10; v++){
+      const s = RS[v];
+      const dc = s.g.reduce(function(a,b){ return a + b[0]*b[1]; }, 0);
+      const ccBits = v < 10 ? 8 : 16;
+      const need = 4 + ccBits + bytes.length*8;
+      if(need <= dc*8){ version = v; spec = s; dcTotal = dc; break; }
+    }
+    if(!version) throw new Error('Data terlalu panjang untuk QR demo');
+
+    const bits = [];
+    function push(val, len){ for(let i=len-1;i>=0;i--) bits.push((val>>i)&1); }
+    push(4, 4);
+    push(bytes.length, version < 10 ? 8 : 16);
+    for(let i=0;i<bytes.length;i++) push(bytes[i], 8);
+    const cap = dcTotal*8;
+    for(let i=0;i<4 && bits.length<cap;i++) bits.push(0);
+    while(bits.length % 8 !== 0) bits.push(0);
+
+    const dataCw = [];
+    for(let i=0;i<bits.length;i+=8){
+      let b = 0;
+      for(let j=0;j<8;j++) b = (b<<1) | bits[i+j];
+      dataCw.push(b);
+    }
+    const pads = [0xEC, 0x11];
+    let pi = 0;
+    while(dataCw.length < dcTotal) dataCw.push(pads[pi++ % 2]);
+
+    const blocks = [];
+    let idx = 0;
+    for(let gi=0; gi<spec.g.length; gi++){
+      const cnt = spec.g[gi][0], dcw = spec.g[gi][1];
+      for(let i=0;i<cnt;i++){
+        const d = dataCw.slice(idx, idx+dcw); idx += dcw;
+        blocks.push({ data:d, ec: rsEncode(d, spec.ec) });
+      }
+    }
+    const maxD = Math.max.apply(null, blocks.map(function(b){ return b.data.length; }));
+    const out = [];
+    for(let i=0;i<maxD;i++) for(let b=0;b<blocks.length;b++) if(i < blocks[b].data.length) out.push(blocks[b].data[i]);
+    for(let i=0;i<spec.ec;i++) for(let b=0;b<blocks.length;b++) out.push(blocks[b].ec[i]);
+
+    return { version: version, codewords: out };
+  }
+
+  function maskFn(m, r, c){
+    switch(m){
+      case 0: return (r + c) % 2 === 0;
+      case 1: return r % 2 === 0;
+      case 2: return c % 3 === 0;
+      case 3: return (r + c) % 3 === 0;
+      case 4: return (Math.floor(r/2) + Math.floor(c/3)) % 2 === 0;
+      case 5: return ((r*c) % 2) + ((r*c) % 3) === 0;
+      case 6: return (((r*c) % 2) + ((r*c) % 3)) % 2 === 0;
+      default: return (((r+c) % 2) + ((r*c) % 3)) % 2 === 0;
+    }
+  }
+
+  function penalty(m, size){
+    let p = 0;
+    for(let r=0;r<size;r++){
+      let run = 1;
+      for(let c=1;c<size;c++){
+        if(m[r][c] === m[r][c-1]) run++;
+        else { if(run >= 5) p += 3 + (run-5); run = 1; }
+      }
+      if(run >= 5) p += 3 + (run-5);
+    }
+    for(let c=0;c<size;c++){
+      let run = 1;
+      for(let r=1;r<size;r++){
+        if(m[r][c] === m[r-1][c]) run++;
+        else { if(run >= 5) p += 3 + (run-5); run = 1; }
+      }
+      if(run >= 5) p += 3 + (run-5);
+    }
+    for(let r=0;r<size-1;r++) for(let c=0;c<size-1;c++){
+      const v = m[r][c];
+      if(v === m[r][c+1] && v === m[r+1][c] && v === m[r+1][c+1]) p += 3;
+    }
+    let dark = 0;
+    for(let r=0;r<size;r++) for(let c=0;c<size;c++) dark += m[r][c];
+    const pct = dark * 100 / (size*size);
+    p += Math.floor(Math.abs(pct - 50) / 5) * 10;
+    return p;
+  }
+
+  function build(text){
+    const enc = makeCodewords(text);
+    const version = enc.version;
+    const cw = enc.codewords;
+    const size = version*4 + 17;
+
+    const mat = [], fn = [];
+    for(let i=0;i<size;i++){
+      mat.push(new Array(size).fill(0));
+      fn.push(new Array(size).fill(false));
+    }
+    function setF(r,c,v){
+      if(r<0||r>=size||c<0||c>=size) return;
+      mat[r][c] = v; fn[r][c] = true;
+    }
+
+    function finder(r0,c0){
+      for(let i=-1;i<=7;i++) for(let j=-1;j<=7;j++){
+        let v = 0;
+        if(i>=0 && i<=6 && j>=0 && j<=6){
+          v = (i===0||i===6||j===0||j===6||(i>=2&&i<=4&&j>=2&&j<=4)) ? 1 : 0;
+        }
+        setF(r0+i, c0+j, v);
+      }
+    }
+    finder(0,0); finder(0,size-7); finder(size-7,0);
+
+    for(let i=8;i<size-8;i++){
+      const v = (i % 2 === 0) ? 1 : 0;
+      setF(6,i,v); setF(i,6,v);
+    }
+
+    const ap = APOS[version] || [];
+    for(let a=0;a<ap.length;a++) for(let b=0;b<ap.length;b++){
+      const r = ap[a], c = ap[b];
+      if((r<=8&&c<=8) || (r<=8&&c>=size-9) || (r>=size-9&&c<=8)) continue;
+      for(let i=-2;i<=2;i++) for(let j=-2;j<=2;j++){
+        setF(r+i, c+j, Math.max(Math.abs(i),Math.abs(j)) !== 1 ? 1 : 0);
+      }
+    }
+
+    setF(size-8, 8, 1);
+
+    for(let i=0;i<=8;i++){
+      if(i !== 6){ setF(8,i,0); setF(i,8,0); }
+    }
+    setF(8,8,0);
+    for(let i=0;i<8;i++){ setF(8, size-1-i, 0); setF(size-1-i, 8, 0); }
+    for(let i=0;i<9;i++){ setF(size-1-i, 8, 0); }
+
+    let vBits = 0;
+    if(version >= 7){
+      vBits = bchVersion(version);
+      for(let i=0;i<18;i++){
+        const bit = (vBits >> i) & 1;
+        const a = size - 11 + (i % 3);
+        const b = Math.floor(i / 3);
+        setF(b, a, bit);
+        setF(a, b, bit);
+      }
+    }
+
+    const bits = [];
+    for(let i=0;i<cw.length;i++) for(let b=7;b>=0;b--) bits.push((cw[i]>>b)&1);
+    let bi = 0;
+    for(let right = size-1; right >= 1; right -= 2){
+      if(right === 6) right = 5;
+      for(let vert = 0; vert < size; vert++){
+        for(let j = 0; j < 2; j++){
+          const x = right - j;
+          const upward = ((right + 1) & 2) === 0;
+          const y = upward ? size - 1 - vert : vert;
+          if(!fn[y][x] && bi < bits.length){
+            mat[y][x] = bits[bi++];
+          }
+        }
+      }
+    }
+
+    let bestMask = 0, bestPen = Infinity, bestMat = null;
+    for(let m=0;m<8;m++){
+      const t = mat.map(function(row){ return row.slice(); });
+      for(let r=0;r<size;r++) for(let c=0;c<size;c++){
+        if(!fn[r][c] && maskFn(m, r, c)) t[r][c] ^= 1;
+      }
+      const fbits = bchFormat((1 << 3) | m); // EC level L = 01
+      for(let i=0;i<=5;i++) t[i][8] = (fbits>>i)&1;
+      t[7][8] = (fbits>>6)&1;
+      t[8][8] = (fbits>>7)&1;
+      t[8][7] = (fbits>>8)&1;
+      for(let i=9;i<15;i++) t[8][14-i] = (fbits>>i)&1;
+      for(let i=0;i<8;i++) t[8][size-1-i] = (fbits>>i)&1;
+      for(let i=8;i<15;i++) t[size-15+i][8] = (fbits>>i)&1;
+      t[size-8][8] = 1;
+
+      const pen = penalty(t, size);
+      if(pen < bestPen){ bestPen = pen; bestMask = m; bestMat = t; }
+    }
+
+    return { size: size, matrix: bestMat };
+  }
+
+  function toSVG(text, moduleSize, margin){
+    const res = build(text);
+    const ms = moduleSize || 6;
+    const mg = margin === undefined ? 2 : margin;
+    const size = res.size;
+    const dim = (size + mg*2) * ms;
+    let path = '';
+    for(let r=0;r<size;r++) for(let c=0;c<size;c++){
+      if(res.matrix[r][c]) path += 'M' + ((c+mg)*ms) + ' ' + ((r+mg)*ms) + 'h' + ms + 'v' + ms + 'h-' + ms + 'z';
+    }
+    return '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' + dim + ' ' + dim + '" width="100%" height="100%" shape-rendering="crispEdges"><rect width="' + dim + '" height="' + dim + '" fill="#FFFFFF"/><path d="' + path + '" fill="#0E1020"/></svg>';
+  }
+
+  return { build: build, toSVG: toSVG };
+})();
+
+/* -------------------------------------------------------------
+   3. STATE & STORAGE
+   ------------------------------------------------------------- */
+const LS_KEY = 'gwallet_demo_v1';
+let state = null;
+let displayBalance = 0;
+let animRAF = null;
+
+function uid(prefix){
+  return (prefix||'') + Math.random().toString(36).slice(2,9).toUpperCase();
+}
+function nowISO(){ return new Date().toISOString(); }
+
+function defaultState(){
+  return {
+    version: 1,
+    balance: 250000,
+    initialBalance: 250000,
+    balanceVisible: true,
+    user: {
+      name: 'Pengguna Demo',
+      id: 'GW-0001-DEMO',
+      email: 'demo@xtan.local',
+      avatar: ''
+    },
+    tx: [],
+    settings: { theme: 'light', anim: true, fx: true },
+    notifs: [
+      { id:'n1', title:'Selamat datang di G-Wallet Demo', body:'Ini simulator dompet digital. Tidak ada uang sungguhan yang diproses.', time: Date.now()-4200000, read:false, icon:'info' },
+      { id:'n2', title:'Mode Simulasi Aktif', body:'Semua saldo & transaksi disimpan lokal di perangkat kamu.', time: Date.now()-9000000, read:false, icon:'shield' }
+    ],
+    seeded: false
+  };
+}
+
+function loadState(){
+  try{
+    const raw = localStorage.getItem(LS_KEY);
+    if(!raw) return defaultState();
+    const parsed = JSON.parse(raw);
+    const base = defaultState();
+    const merged = Object.assign(base, parsed);
+    merged.settings = Object.assign(base.settings, parsed.settings || {});
+    merged.user = Object.assign(base.user, parsed.user || {});
+    if(!Array.isArray(merged.tx)) merged.tx = [];
+    if(!Array.isArray(merged.notifs)) merged.notifs = base.notifs;
+    return merged;
+  }catch(e){
+    return defaultState();
+  }
+}
+function save(){
+  try{ localStorage.setItem(LS_KEY, JSON.stringify(state)); }
+  catch(e){ /* storage penuh / private mode */ }
+}
+
+/* -------------------------------------------------------------
+   4. UTILITIES
+   ------------------------------------------------------------- */
+function rp(n){
+  const v = Math.max(0, Math.round(Number(n) || 0));
+  return 'Rp ' + v.toLocaleString('id-ID');
+}
+function rpShort(n){
+  const v = Math.abs(Math.round(Number(n)||0));
+  if(v >= 1000000) return 'Rp ' + (v/1000000).toFixed(v % 1000000 === 0 ? 0 : 1).replace('.',',') + 'jt';
+  if(v >= 1000) return 'Rp ' + Math.round(v/1000) + 'rb';
+  return 'Rp ' + v;
+}
+function esc(s){
+  return String(s == null ? '' : s)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
+    .replace(/"/g,'&quot;').replace(/'/g,'&#39;');
+}
+function parseAmount(str){
+  return Number(String(str||'').replace(/[^\d]/g,'')) || 0;
+}
+function fmtAmountInput(el){
+  const raw = el.value.replace(/\D/g,'');
+  el.value = raw ? Number(raw).toLocaleString('id-ID') : '';
+}
+function dayKey(d){
+  const x = new Date(d);
+  return x.getFullYear() + '-' + String(x.getMonth()+1).padStart(2,'0') + '-' + String(x.getDate()).padStart(2,'0');
+}
+function fmtDateLabel(iso){
+  const d = new Date(iso);
+  const today = new Date(); today.setHours(0,0,0,0);
+  const yest = new Date(today); yest.setDate(yest.getDate()-1);
+  const dd = new Date(d); dd.setHours(0,0,0,0);
+  const time = d.toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit'}).replace('.',':');
+  if(dd.getTime() === today.getTime()) return 'Hari ini · ' + time;
+  if(dd.getTime() === yest.getTime()) return 'Kemarin · ' + time;
+  const opts = { day:'numeric', month:'short', year:'numeric' };
+  return d.toLocaleDateString('id-ID', opts) + ' · ' + time;
+}
+function fmtDateFull(iso){
+  const d = new Date(iso);
+  return d.toLocaleDateString('id-ID',{weekday:'long',day:'numeric',month:'long',year:'numeric'}) +
+    ', ' + d.toLocaleTimeString('id-ID',{hour:'2-digit',minute:'2-digit',second:'2-digit'}).replace(/\./g,':');
+}
+function dayTitle(iso){
+  const d = new Date(iso);
+  const today = new Date(); today.setHours(0,0,0,0);
+  const yest = new Date(today); yest.setDate(yest.getDate()-1);
+  const dd = new Date(d); dd.setHours(0,0,0,0);
+  if(dd.getTime() === today.getTime()) return 'Hari Ini';
+  if(dd.getTime() === yest.getTime()) return 'Kemarin';
+  return d.toLocaleDateString('id-ID',{weekday:'long', day:'numeric', month:'long', year:'numeric'});
+}
+
+function toast(msg, type){
+  const root = document.getElementById('toastRoot');
+  const el = document.createElement('div');
+  el.className = 'toast ' + (type || '');
+  const ic = type === 'success' ? 'check' : (type === 'error' ? 'alert' : 'info');
+  el.innerHTML = '<span class="ic-wrap">' + svgIcon(ic, 18) + '</span><span>' + esc(msg) + '</span>';
+  root.appendChild(el);
+  requestAnimationFrame(function(){ el.classList.add('show'); });
+  setTimeout(function(){
+    el.classList.remove('show');
+    setTimeout(function(){ el.remove(); }, 320);
+  }, 2700);
+}
+
+/* -------------------------------------------------------------
+   5. SHEET SYSTEM
+   ------------------------------------------------------------- */
+const sheetStack = [];
+
+function openSheet(opts){
+  opts = opts || {};
+  const wrap = document.createElement('div');
+  wrap.className = 'sheet-backdrop';
+  wrap.style.zIndex = String(1000 + sheetStack.length * 10);
+  wrap.innerHTML =
+    '<div class="sheet" role="dialog" aria-modal="true">' +
+      '<div class="sheet-handle"></div>' +
+      '<div class="sheet-head">' +
+        '<div style="flex:1;min-width:0">' +
+          '<div class="sheet-title">' + esc(opts.title || '') + '</div>' +
+          (opts.subtitle ? '<div class="sheet-sub">' + esc(opts.subtitle) + '</div>' : '') +
+        '</div>' +
+        '<button class="icon-btn sheet-close" aria-label="Tutup">' + svgIcon('close', 18) + '</button>' +
+      '</div>' +
+      '<div class="sheet-body">' + (opts.body || '') + '</div>' +
+      (opts.footer ? '<div class="sheet-foot">' + opts.footer + '</div>' : '') +
+    '</div>';
+
+  document.getElementById('sheetRoot').appendChild(wrap);
+  hydrateIcons(wrap);
+
+  const rec = { el: wrap, opts: opts, onClose: opts.onClose || null };
+  sheetStack.push(rec);
+
+  requestAnimationFrame(function(){ wrap.classList.add('open'); });
+
+  function closeSelf(){ closeSheet(rec); }
+  wrap.querySelector('.sheet-close').addEventListener('click', closeSelf);
+  wrap.addEventListener('click', function(e){
+    if(e.target === wrap && opts.dismissible !== false) closeSelf();
+  });
+
+  if(opts.onMount) opts.onMount(wrap);
+  return wrap;
+}
+
+function closeSheet(rec){
+  let idx = -1;
+  if(rec) idx = sheetStack.indexOf(rec);
+  else idx = sheetStack.length - 1;
+  if(idx < 0) return;
+  const r = sheetStack[idx];
+  sheetStack.splice(idx, 1);
+  const el = r.el;
+  el.classList.remove('open');
+  if(r.onClose){ try{ r.onClose(); }catch(e){} }
+  setTimeout(function(){ el.remove(); }, 300);
+}
+function closeAllSheets(){ while(sheetStack.length) closeSheet(sheetStack[sheetStack.length-1]); }
+
+/* -------------------------------------------------------------
+   6. BALANCE
+   ------------------------------------------------------------- */
+function setBalanceValue(v, animate){
+  const val = Math.max(0, Math.round(Number(v) || 0));
+  const from = state.balance;
+  state.balance = val;
+  save();
+  if(animate !== false && state.settings.anim && Math.abs(val - from) > 0){
+    animateBalance(from, val);
+  } else {
+    displayBalance = val;
+    paintBalance();
+  }
+  renderStatsAll();
+}
+function animateBalance(from, to){
+  if(animRAF) cancelAnimationFrame(animRAF);
+  const t0 = performance.now();
+  const dur = 650;
+  function step(t){
+    const p = Math.min(1, (t - t0) / dur);
+    const e = 1 - Math.pow(1 - p, 3);
+    displayBalance = from + (to - from) * e;
+    paintBalance();
+    if(p < 1){ animRAF = requestAnimationFrame(step); }
+    else { displayBalance = to; paintBalance(); animRAF = null; }
+  }
+  animRAF = requestAnimationFrame(step);
+}
+function paintBalance(){
+  const txt = state.balanceVisible ? rp(displayBalance) : 'Rp ••••••••';
+  const a = document.getElementById('balHome');
+  const b = document.getElementById('balWallet');
+  if(a) a.textContent = txt;
+  if(b) b.textContent = txt;
+  const eyeIcons = document.querySelectorAll('#btnEye [data-ic], #btnEye2 [data-ic]');
+  const name = state.balanceVisible ? 'eye' : 'eyeOff';
+  document.querySelectorAll('#btnEye, #btnEye2').forEach(function(btn){
+    btn.innerHTML = svgIcon(name, 17);
+  });
+}
+
+/* -------------------------------------------------------------
+   7. TRANSACTIONS
+   ------------------------------------------------------------- */
+const KIND_META = {
+  topup:    { icon:'plus',    label:'Top Up Demo' },
+  transfer: { icon:'send',    label:'Transfer Demo' },
+  receive:  { icon:'download',label:'Terima Saldo' },
+  qr:       { icon:'qr',      label:'Bayar QR Demo' },
+  pulsa:    { icon:'phone',   label:'Pulsa Demo' },
+  tagihan:  { icon:'receipt', label:'Tagihan Demo' },
+  bonus:    { icon:'gift',    label:'Bonus Demo' },
+  adjust:   { icon:'sliders', label:'Penyesuaian' },
+  random:   { icon:'dice',    label:'Transaksi Demo' }
+};
+
+function createTx(o){
+  const tx = {
+    id: 'TX-' + Date.now().toString(36).toUpperCase() + '-' + uid('').slice(0,4),
+    dir: o.dir === 'in' ? 'in' : 'out',
+    kind: o.kind || 'random',
+    title: o.title || 'Transaksi Demo',
+    sub: o.sub || '',
+    amount: Math.max(0, Math.round(Number(o.amount) || 0)),
+    note: o.note || '',
+    date: o.date || nowISO(),
+    status: 'success',
+    meta: o.meta || {}
+  };
+  state.tx.unshift(tx);
+  save();
+  return tx;
+}
+function delTx(id){
+  const i = state.tx.findIndex(function(t){ return t.id === id; });
+  if(i >= 0){ state.tx.splice(i,1); save(); return true; }
+  return false;
+}
+function txStats(list){
+  let inc = 0, out = 0;
+  for(let i=0;i<list.length;i++){
+    if(list[i].dir === 'in') inc += list[i].amount; else out += list[i].amount;
+  }
+  return { inc: inc, out: out, count: list.length };
+}
+
+/* -------------------------------------------------------------
+   8. RENDER — SHARED
+   ------------------------------------------------------------- */
+function txItemHTML(t){
+  const m = KIND_META[t.kind] || KIND_META.random;
+  const sign = t.dir === 'in' ? '+' : '-';
+  return '<button class="tx-item" data-tx="' + esc(t.id) + '">' +
+    '<span class="tx-ico ' + t.dir + '">' + svgIcon(m.icon, 19) + '</span>' +
+    '<span class="tx-mid">' +
+      '<span class="tx-title">' + esc(t.title) + '</span>' +
+      '<span class="tx-sub">' + esc(fmtDateLabel(t.date)) + (t.sub ? ' · ' + esc(t.sub) : '') + '</span>' +
+    '</span>' +
+    '<span class="tx-amt ' + t.dir + '">' + sign + ' ' + esc(rp(t.amount).replace('Rp ','Rp ')) + '</span>' +
+  '</button>';
+}
+
+function emptyHTML(icon, title, sub){
+  return '<div class="empty">' +
+    '<div class="eico">' + svgIcon(icon, 28) + '</div>' +
+    '<h4>' + esc(title) + '</h4>' +
+    '<p>' + esc(sub) + '</p>' +
+  '</div>';
+}
+
+/* -------------------------------------------------------------
+   9. RENDER — HOME
+   ------------------------------------------------------------- */
+const SHORTCUTS = [
+  { act:'topup',    icon:'plus',     label:'Top Up',   g:'' },
+  { act:'transfer', icon:'send',     label:'Transfer', g:'g2' },
+  { act:'qr',       icon:'qr',       label:'QR Demo',  g:'g4' },
+  { act:'history',  icon:'clock',    label:'Riwayat',  g:'' },
+  { act:'promos',   icon:'gift',     label:'Promo',    g:'g3' },
+  { act:'pulsa',    icon:'phone',    label:'Pulsa',    g:'g3' },
+  { act:'tagihan',  icon:'receipt',  label:'Tagihan',  g:'g2' },
+  { act:'admin',    icon:'bolt',     label:'Admin',    g:'g5' }
+];
+
+function renderShortcuts(){
+  const el = document.getElementById('shortcutGrid');
+  if(!el) return;
+  el.innerHTML = SHORTCUTS.map(function(s){
+    return '<button class="shortcut" data-act="' + s.act + '">' +
+      '<span class="sc-ico ' + s.g + '">' + svgIcon(s.icon, 18) + '</span>' +
+      '<span>' + esc(s.label) + '</span>' +
+    '</button>';
+  }).join('');
+}
+
+const PROMOS = [
+  { id:'p1', cls:'p1', tag:'CASHBACK', title:'Cashback Demo 20%', sub:'Maks. Rp 10.000 · Simulasi',
+    desc:'Cashback simulasi untuk setiap transaksi demo. Angka dan ketentuan hanya untuk keperluan demonstrasi antarmuka.',
+    terms:['Berlaku untuk transaksi demo','Maksimal cashback Rp 10.000 (simulasi)','Tidak dapat diklaim di dunia nyata'] },
+  { id:'p2', cls:'p2', tag:'VOUCHER', title:'Voucher Demo Rp 15.000', sub:'Min. transaksi Rp 50.000',
+    desc:'Voucher fiktif untuk demonstrasi alur klaim promo pada aplikasi dompet digital.',
+    terms:['Minimum transaksi simulasi Rp 50.000','Berlaku 1x per akun demo','Voucher tidak memiliki nilai nyata'] },
+  { id:'p3', cls:'p3', tag:'DISKON', title:'Diskon Demo 30%', sub:'Semua merchant demo',
+    desc:'Diskon simulasi untuk merchant fiktif di dalam G-Wallet Demo. Hanya ilustrasi tampilan promo.',
+    terms:['Berlaku di merchant demo','Maksimal diskon Rp 25.000 (simulasi)','Tidak terhubung ke sistem pembayaran'] },
+  { id:'p4', cls:'p4', tag:'NEW USER', title:'Promo Pengguna Baru', sub:'Bonus saldo demo Rp 20.000',
+    desc:'Bonus saldo simulasi untuk pengguna baru G-Wallet Demo. Saldo hanya angka demo di perangkat kamu.',
+    terms:['Hanya untuk akun demo baru','Bonus masuk sebagai transaksi simulasi','Bukan insentif finansial nyata'] }
+];
+
+function renderPromos(){
+  const el = document.getElementById('promoScroll');
+  if(el){
+    el.innerHTML = PROMOS.map(function(p){
+      return '<button class="promo-card ' + p.cls + '" data-promo="' + p.id + '">' +
+        '<span class="promo-tag">' + esc(p.tag) + '</span>' +
+        '<div><h4>' + esc(p.title) + '</h4><p>' + esc(p.sub) + '</p></div>' +
+      '</button>';
+    }).join('');
+  }
+  const list = document.getElementById('promoList');
+  if(list){
+    list.innerHTML = PROMOS.map(function(p){
+      return '<div class="card" style="padding:0;overflow:hidden;border:none">' +
+        '<div class="promo-card ' + p.cls + '" style="flex:none;min-height:118px;border-radius:18px" data-promo="' + p.id + '">' +
+          '<span class="promo-tag">' + esc(p.tag) + '</span>' +
+          '<div><h4>' + esc(p.title) + '</h4><p>' + esc(p.sub) + '</p></div>' +
+        '</div>' +
+        '<div style="padding:12px 4px 0"><p class="small-note">' + esc(p.desc) + '</p>' +
+        '<button class="btn btn-soft full mt12" data-promo-claim="' + p.id + '">' + svgIcon('gift',16) + ' Klaim Demo</button></div>' +
+      '</div>';
+    }).join('');
+  }
+}
+
+function renderHomeTx(){
+  const el = document.getElementById('homeTxList');
+  if(!el) return;
+  const list = state.tx.slice(0, 4);
+  if(!list.length){
+    el.innerHTML = emptyHTML('receipt','Belum ada transaksi','Mulai dengan Top Up Demo untuk melihat riwayat di sini.');
+    return;
+  }
+  el.innerHTML = list.map(txItemHTML).join('');
+}
+
+/* -------------------------------------------------------------
+   10. RENDER — STATS & CHART
+   ------------------------------------------------------------- */
+function last7Days(){
+  const out = [];
+  for(let i=6;i>=0;i--){
+    const d = new Date();
+    d.setHours(0,0,0,0);
+    d.setDate(d.getDate() - i);
+    const n = new Date(d); n.setDate(n.getDate()+1);
+    let inc = 0, out = 0;
+    for(let k=0;k<state.tx.length;k++){
+      const t = state.tx[k];
+      const td = new Date(t.date);
+      if(td >= d && td < n){
+        if(t.dir === 'in') inc += t.amount; else out += t.amount;
+      }
+    }
+    out.push({
+      label: ['Min','Sen','Sel','Rab','Kam','Jum','Sab'][d.getDay()],
+      inc: inc, out: out
+    });
+  }
+  return out;
+}
+
+function chartHTML(){
+  const days = last7Days();
+  let max = 1;
+  days.forEach(function(d){ max = Math.max(max, d.inc, d.out); });
+  return days.map(function(d){
+    const hi = Math.max(3, Math.round(d.inc / max * 78));
+    const ho = Math.max(3, Math.round(d.out / max * 78));
+    return '<div class="chart-col">' +
+      '<div class="chart-bars">' +
+        '<div class="chart-bar in" style="height:' + hi + 'px"></div>' +
+        '<div class="chart-bar out" style="height:' + ho + 'px"></div>' +
+      '</div>' +
+      '<span class="chart-lbl">' + d.label + '</span>' +
+    '</div>';
+  }).join('');
+}
+
+function statRowHTML(s){
+  return '<div class="stat-box">' +
+      '<div class="lb">' + svgIcon('download',11) + ' Masuk</div>' +
+      '<div class="vl in">' + esc(rpShort(s.inc)) + '</div>' +
+    '</div>' +
+    '<div class="stat-box">' +
+      '<div class="lb">' + svgIcon('upload',11) + ' Keluar</div>' +
+      '<div class="vl out">' + esc(rpShort(s.out)) + '</div>' +
+    '</div>' +
+    '<div class="stat-box">' +
+      '<div class="lb">' + svgIcon('receipt',11) + ' Total</div>' +
+      '<div class="vl">' + s.count + '</div>' +
+    '</div>';
+}
+
+function renderStatsAll(){
+  const s = txStats(state.tx);
+  const h = statRowHTML(s);
+  const a = document.getElementById('statRow'); if(a) a.innerHTML = h;
+  const b = document.getElementById('walletStatRow'); if(b) b.innerHTML = h;
+  const c = document.getElementById('profStatRow'); if(c) c.innerHTML = h;
+
+  const ch = chartHTML();
+  const hc = document.getElementById('homeChart'); if(hc) hc.innerHTML = ch;
+  const wc = document.getElementById('walletChart'); if(wc) wc.innerHTML = ch;
+
+  const ib = document.getElementById('initBalTxt');
+  if(ib) ib.textContent = rp(state.initialBalance);
+}
+
+/* -------------------------------------------------------------
+   11. RENDER — ACTIVITY
+   ------------------------------------------------------------- */
+let actFilter = 'all';
+let actQuery = '';
+
+function filteredTx(){
+  let list = state.tx.slice();
+  if(actFilter === 'in') list = list.filter(function(t){ return t.dir === 'in'; });
+  else if(actFilter === 'out') list = list.filter(function(t){ return t.dir === 'out'; });
+  else if(actFilter === 'topup') list = list.filter(function(t){ return t.kind === 'topup'; });
+  else if(actFilter === 'transfer') list = list.filter(function(t){ return t.kind === 'transfer' || t.kind === 'receive'; });
+  else if(actFilter === 'qr') list = list.filter(function(t){ return t.kind === 'qr'; });
+
+  const q = actQuery.trim().toLowerCase();
+  if(q){
+    list = list.filter(function(t){
+      return (t.title + ' ' + t.sub + ' ' + t.note + ' ' + t.id + ' ' + t.amount).toLowerCase().indexOf(q) >= 0;
+    });
+  }
+  return list;
+}
+
+function renderActivity(){
+  const wrap = document.getElementById('activityList');
+  if(!wrap) return;
+  const list = filteredTx();
+
+  const st = txStats(list);
+  const sr = document.getElementById('actStatRow');
+  if(sr) sr.innerHTML = statRowHTML(st);
+
+  if(!list.length){
+    wrap.innerHTML = emptyHTML('search','Tidak ada transaksi','Coba ubah filter atau kata kunci pencarian kamu.');
+    return;
+  }
+
+  const groups = {};
+  const order = [];
+  list.forEach(function(t){
+    const k = dayKey(t.date);
+    if(!groups[k]){ groups[k] = []; order.push(k); }
+    groups[k].push(t);
+  });
+
+  let html = '';
+  order.forEach(function(k){
+    html += '<div class="day-label">' + esc(dayTitle(groups[k][0].date)) + '</div>';
+    html += '<div class="tx-list">' + groups[k].map(txItemHTML).join('') + '</div>';
+  });
+  wrap.innerHTML = html;
+}
+
+/* -------------------------------------------------------------
+   12. RENDER — PROFILE
+   ------------------------------------------------------------- */
+function initials(name){
+  const parts = String(name||'PD').trim().split(/\s+/);
+  if(parts.length === 1) return parts[0].slice(0,2).toUpperCase();
+  return (parts[0][0] + parts[parts.length-1][0]).toUpperCase();
+}
+function renderProfile(){
+  const av = document.getElementById('profAvatar');
+  if(av){
+    if(state.user.avatar){
+      av.style.backgroundImage = 'url(' + state.user.avatar + ')';
+      av.textContent = '';
+    } else {
+      av.style.backgroundImage = '';
+      av.textContent = initials(state.user.name);
+    }
+  }
+  const n = document.getElementById('profName'); if(n) n.textContent = state.user.name;
+  const i = document.getElementById('profId'); if(i) i.textContent = state.user.id;
+  const e = document.getElementById('profEmail'); if(e) e.textContent = state.user.email || '—';
+
+  const unread = state.notifs.filter(function(x){ return !x.read; }).length;
+  const nt = document.getElementById('notifCountTxt');
+  if(nt) nt.textContent = state.notifs.length + ' pesan' + (unread ? ' · ' + unread + ' baru' : '');
+  const dot = document.getElementById('notifDot');
+  if(dot) dot.classList.toggle('on', unread > 0);
+}
+
+/* -------------------------------------------------------------
+   13. NAVIGATION
+   ------------------------------------------------------------- */
+const NAV_PAGES = ['home','wallet','qr','activity','profile'];
+let currentPage = 'home';
+
+function showPage(name){
+  currentPage = name;
+  document.querySelectorAll('.page').forEach(function(p){
+    p.classList.toggle('active', p.id === 'page-' + name);
+  });
+  document.querySelectorAll('.nav-item').forEach(function(b){
+    b.classList.toggle('on', b.dataset.nav === name);
+  });
+  const back = document.getElementById('btnBack');
+  if(back) back.hidden = NAV_PAGES.indexOf(name) >= 0;
+
+  window.scrollTo({ top: 0, behavior: state.settings.anim ? 'smooth' : 'auto' });
+
+  if(name === 'activity') renderActivity();
+  if(name === 'admin') renderAdmin();
+  if(name === 'profile') renderProfile();
+  if(name === 'qr') ensureQR();
+  hydrateIcons(document);
+}
+
+/* -------------------------------------------------------------
+   14. SHEETS — TOP UP
+   ------------------------------------------------------------- */
+function topUpSheet(){
+  openSheet({
+    title: 'Top Up Demo',
+    subtitle: 'Saldo bertambah secara lokal (simulasi)',
+    body:
+      '<div class="sim-banner">' + svgIcon('info',18) + '<span>SIMULASI SAJA — Tidak ada uang sungguhan yang diproses.</span></div>' +
+      '<div class="field">' +
+        '<label>Nominal Top Up</label>' +
+        '<div class="input-prefix"><span class="pfx">Rp</span>' +
+        '<input class="input amount-input" id="tuAmount" type="text" inputmode="numeric" placeholder="0" style="padding-left:40px!important"></div>' +
+      '</div>' +
+      '<div class="preset-grid mb8" id="tuPresets"></div>' +
+      '<div class="field mt12">' +
+        '<label>Metode (dummy)</label>' +
+        '<select class="input" id="tuMethod">' +
+          '<option value="Bank Demo Nusantara">Bank Demo Nusantara</option>' +
+          '<option value="Bank Demo Samudra">Bank Demo Samudra</option>' +
+          '<option value="E-Wallet Demo Kita">E-Wallet Demo Kita</option>' +
+          '<option value="Gerai Demo Retail">Gerai Demo Retail</option>' +
+          '<option value="Kartu Demo Virtual">Kartu Demo Virtual</option>' +
+        '</select>' +
+      '</div>' +
+      '<div class="field">' +
+        '<label>Catatan (opsional)</label>' +
+        '<input class="input" id="tuNote" type="text" maxlength="48" placeholder="Contoh: Top up simulasi">' +
+      '</div>' +
+      '<p class="small-note center">Metode pembayaran di atas hanyalah nama fiktif. Tidak ada data rekening, kartu, atau instrumen pembayaran yang diminta.</p>',
+    footer: '<button class="btn btn-ghost" id="tuCancel">Batal</button>' +
+            '<button class="btn btn-primary" id="tuNext">Lanjut Konfirmasi</button>',
+    onMount: function(el){
+      const presets = [20000,50000,100000,200000,500000,1000000];
+      const pg = el.querySelector('#tuPresets');
+      pg.innerHTML = presets.map(function(p){
+        return '<button class="preset" data-amt="' + p + '">' + rp(p) + '</button>';
+      }).join('');
+      const inp = el.querySelector('#tuAmount');
+      inp.addEventListener('input', function(){ fmtAmountInput(inp); });
+      pg.addEventListener('click', function(e){
+        const b = e.target.closest('.preset');
+        if(!b) return;
+        pg.querySelectorAll('.preset').forEach(function(x){ x.classList.remove('on'); });
+        b.classList.add('on');
+        inp.value = Number(b.dataset.amt).toLocaleString('id-ID');
+      });
+      el.querySelector('#tuCancel').addEventListener('click', function(){ closeSheet(); });
+      el.querySelector('#tuNext').addEventListener('click', function(){
+        const amt = parseAmount(inp.value);
+        if(amt < 1000){ toast('Minimal top up demo Rp 1.000', 'error'); return; }
+        if(amt > 100000000){ toast('Maksimal top up demo Rp 100.000.000', 'error'); return; }
+        const method = el.querySelector('#tuMethod').value;
+        const note = el.querySelector('#tuNote').value.trim();
+        closeSheet();
+        confirmTopUp(amt, method, note);
+      });
+    }
+  });
+}
+
+function confirmTopUp(amt, method, note){
+  openSheet({
+    title: 'Konfirmasi Top Up',
+    subtitle: 'Periksa detail sebelum melanjutkan',
+    body:
+      '<div class="sim-banner">' + svgIcon('info',18) + '<span>SIMULASI SAJA — Tidak ada uang sungguhan yang diproses.</span></div>' +
+      '<div class="card flat" style="background:var(--surface-2);border-radius:15px;padding:4px 14px">' +
+        '<div class="drow"><span class="k">Jenis</span><span class="v">Top Up Demo</span></div>' +
+        '<div class="drow"><span class="k">Nominal</span><span class="v" style="font-size:15px">' + esc(rp(amt)) + '</span></div>' +
+        '<div class="drow"><span class="k">Metode</span><span class="v">' + esc(method) + '</span></div>' +
+        '<div class="drow"><span class="k">Catatan</span><span class="v">' + esc(note || '—') + '</span></div>' +
+        '<div class="drow"><span class="k">Saldo setelah</span><span class="v">' + esc(rp(state.balance + amt)) + '</span></div>' +
+      '</div>' +
+      '<p class="small-note center mt8">Dengan melanjutkan, saldo demo akan bertambah secara lokal di perangkat kamu.</p>',
+    footer: '<button class="btn btn-ghost" id="cfCancel">Batal</button>' +
+            '<button class="btn btn-primary" id="cfOk">Konfirmasi</button>',
+    onMount: function(el){
+      el.querySelector('#cfCancel').addEventListener('click', function(){ closeSheet(); });
+      el.querySelector('#cfOk').addEventListener('click', function(){
+        closeSheet();
+        const tx = createTx({
+          dir:'in', kind:'topup', title:'Top Up Demo', sub:method, amount:amt, note:note
+        });
+        setBalanceValue(state.balance + amt, true);
+        pushNotif('Top Up Demo berhasil', rp(amt) + ' ditambahkan ke saldo simulasi.', 'plus');
+        renderAll();
+        successSheet('Top Up Berhasil (Simulasi)', amt, 'Saldo demo telah ditambahkan.', tx.id);
+      });
+    }
+  });
+}
+
+/* -------------------------------------------------------------
+   15. SHEETS — TRANSFER
+   ------------------------------------------------------------- */
+const DEMO_CONTACTS = [
+  { num:'081200000001', name:'Andi Pratama' },
+  { num:'081200000002', name:'Bunga Lestari' },
+  { num:'081200000003', name:'Citra Dewi' },
+  { num:'081200000004', name:'Darma Wijaya' },
+  { num:'081200000005', name:'Eka Saputra' },
+  { num:'081200000006', name:'Fajar Nugroho' },
+  { num:'081200000007', name:'Gita Permata' },
+  { num:'081200000008', name:'Hendra Kusuma' },
+  { num:'081300000010', name:'Indah Sari' },
+  { num:'081300000011', name:'Joko Susilo' }
+];
+
+function transferSheet(){
+  openSheet({
+    title: 'Transfer Demo',
+    subtitle: 'Kirim saldo simulasi ke nomor fiktif',
+    body:
+      '<div class="sim-banner">' + svgIcon('info',18) + '<span>SIMULASI SAJA — Tidak ada uang sungguhan yang diproses.</span></div>' +
+      '<div class="field">' +
+        '<label>Nomor Tujuan (fiktif)</label>' +
+        '<input class="input" id="tfNum" type="tel" inputmode="numeric" maxlength="14" placeholder="Contoh: 081200000001">' +
+      '</div>' +
+      '<div class="chips scroll mb8" id="tfContacts"></div>' +
+      '<div class="field">' +
+        '<label>Nama Penerima (fiktif)</label>' +
+        '<input class="input" id="tfName" type="text" maxlength="32" placeholder="Terisi otomatis jika nomor contoh">' +
+      '</div>' +
+      '<div class="field">' +
+        '<label>Nominal</label>' +
+        '<div class="input-prefix"><span class="pfx">Rp</span>' +
+        '<input class="input amount-input" id="tfAmount" type="text" inputmode="numeric" placeholder="0" style="padding-left:40px!important"></div>' +
+      '</div>' +
+      '<div class="preset-grid mb8" id="tfPresets"></div>' +
+      '<div class="field mt12">' +
+        '<label>Catatan (opsional)</label>' +
+        '<input class="input" id="tfNote" type="text" maxlength="48" placeholder="Contoh: Bayar simulasi">' +
+      '</div>' +
+      '<p class="small-note center">Nomor tujuan di atas hanya data fiktif. Jangan memasukkan nomor rekening atau data pribadi asli.</p>',
+    footer: '<button class="btn btn-ghost" id="tfCancel">Batal</button>' +
+            '<button class="btn btn-primary" id="tfNext">Lanjut Konfirmasi</button>',
+    onMount: function(el){
+      const cw = el.querySelector('#tfContacts');
+      cw.innerHTML = DEMO_CONTACTS.slice(0,6).map(function(c){
+        return '<button class="chip" data-num="' + c.num + '" data-name="' + esc(c.name) + '">' + esc(c.name.split(' ')[0]) + '</button>';
+      }).join('');
+
+      const presets = [10000,25000,50000,100000,250000,500000];
+      const pg = el.querySelector('#tfPresets');
+      pg.innerHTML = presets.map(function(p){
+        return '<button class="preset" data-amt="' + p + '">' + rp(p) + '</button>';
+      }).join('');
+
+      const numEl = el.querySelector('#tfNum');
+      const nameEl = el.querySelector('#tfName');
+      const amtEl = el.querySelector('#tfAmount');
+
+      numEl.addEventListener('input', function(){
+        numEl.value = numEl.value.replace(/\D/g,'');
+        const found = DEMO_CONTACTS.find(function(c){ return c.num === numEl.value; });
+        if(found) nameEl.value = found.name;
+      });
+      cw.addEventListener('click', function(e){
+        const b = e.target.closest('.chip');
+        if(!b) return;
+        cw.querySelectorAll('.chip').forEach(function(x){ x.classList.remove('on'); });
+        b.classList.add('on');
+        numEl.value = b.dataset.num;
+        nameEl.value = b.dataset.name;
+      });
+      amtEl.addEventListener('input', function(){ fmtAmountInput(amtEl); });
+      pg.addEventListener('click', function(e){
+        const b = e.target.closest('.preset');
+        if(!b) return;
+        pg.querySelectorAll('.preset').forEach(function(x){ x.classList.remove('on'); });
+        b.classList.add('on');
+        amtEl.value = Number(b.dataset.amt).toLocaleString('id-ID');
+      });
+
+      el.querySelector('#tfCancel').addEventListener('click', function(){ closeSheet(); });
+      el.querySelector('#tfNext').addEventListener('click', function(){
+        const num = numEl.value.trim();
+        const nm = nameEl.value.trim() || 'Penerima Demo';
+        const amt = parseAmount(amtEl.value);
+        const note = el.querySelector('#tfNote').value.trim();
+        if(num.length < 8){ toast('Nomor tujuan minimal 8 digit', 'error'); return; }
+        if(amt < 1000){ toast('Minimal transfer demo Rp 1.000', 'error'); return; }
+        if(amt > state.balance){ toast('Saldo demo tidak mencukupi', 'error'); return; }
+        closeSheet();
+        confirmTransfer(num, nm, amt, note);
+      });
+    }
+  });
+}
+
+function confirmTransfer(num, nm, amt, note){
+  openSheet({
+    title: 'Konfirmasi Transfer',
+    subtitle: 'Periksa detail sebelum melanjutkan',
+    body:
+      '<div class="sim-banner">' + svgIcon('info',18) + '<span>SIMULASI SAJA — Tidak ada uang sungguhan yang diproses.</span></div>' +
+      '<div class="card flat" style="background:var(--surface-2);border-radius:15px;padding:4px 14px">' +
+        '<div class="drow"><span class="k">Penerima</span><span class="v">' + esc(nm) + '</span></div>' +
+        '<div class="drow"><span class="k">Nomor tujuan</span><span class="v mono">' + esc(num) + '</span></div>' +
+        '<div class="drow"><span class="k">Nominal</span><span class="v" style="font-size:15px">' + esc(rp(amt)) + '</span></div>' +
+        '<div class="drow"><span class="k">Catatan</span><span class="v">' + esc(note || '—') + '</span></div>' +
+        '<div class="drow"><span class="k">Saldo setelah</span><span class="v">' + esc(rp(state.balance - amt)) + '</span></div>' +
+      '</div>' +
+      '<p class="small-note center mt8">Transaksi ini tidak dikirim ke mana pun. Saldo demo hanya berkurang di perangkat kamu.</p>',
+    footer: '<button class="btn btn-ghost" id="cfCancel">Batal</button>' +
+            '<button class="btn btn-primary" id="cfOk">Konfirmasi</button>',
+    onMount: function(el){
+      el.querySelector('#cfCancel').addEventListener('click', function(){ closeSheet(); });
+      el.querySelector('#cfOk').addEventListener('click', function(){
+        closeSheet();
+        const tx = createTx({
+          dir:'out', kind:'transfer', title:'Transfer ke ' + nm,
+          sub: num, amount: amt, note: note, meta:{ to: num, name: nm }
+        });
+        setBalanceValue(state.balance - amt, true);
+        pushNotif('Transfer Demo terkirim', rp(amt) + ' ke ' + nm + ' (simulasi).', 'send');
+        renderAll();
+        successSheet('Transfer Berhasil (Simulasi)', amt, 'Saldo demo telah berkurang.', tx.id);
+      });
+    }
+  });
+}
+
+/* -------------------------------------------------------------
+   16. SHEETS — SUCCESS / DETAIL
+   ------------------------------------------------------------- */
+function successSheet(title, amt, sub, txid){
+  openSheet({
+    title: 'Selesai',
+    body:
+      '<div class="success-wrap">' +
+        '<div class="success-ico">' + svgIcon('check', 34) + '</div>' +
+        '<h3>' + esc(title) + '</h3>' +
+        '<div class="amt">' + esc(rp(amt)) + '</div>' +
+        '<p>' + esc(sub) + '</p>' +
+        '<div class="sim-banner" style="margin-top:16px;text-align:left">' + svgIcon('info',18) +
+          '<span>SIMULASI SAJA — Tidak ada uang sungguhan yang diproses.</span></div>' +
+        (txid ? '<p class="small-note mt8">ID Transaksi: <span class="mono">' + esc(txid) + '</span></p>' : '') +
+      '</div>',
+    footer: '<button class="btn btn-ghost" id="okHistory">Lihat Riwayat</button>' +
+            '<button class="btn btn-primary" id="okDone">Selesai</button>',
+    onMount: function(el){
+      el.querySelector('#okDone').addEventListener('click', function(){ closeSheet(); });
+      el.querySelector('#okHistory').addEventListener('click', function(){
+        closeSheet();
+        showPage('activity');
+      });
+    }
+  });
+}
+
+function txDetailSheet(id){
+  const t = state.tx.find(function(x){ return x.id === id; });
+  if(!t) return;
+  const m = KIND_META[t.kind] || KIND_META.random;
+  openSheet({
+    title: 'Detail Transaksi',
+    subtitle: 'Data simulasi tersimpan lokal',
+    body:
+      '<div class="center" style="padding:6px 0 14px">' +
+        '<div class="success-ico" style="background:' + (t.dir === 'in' ? 'var(--success-soft)' : 'var(--danger-soft)') + ';color:' + (t.dir === 'in' ? 'var(--success)' : 'var(--danger)') + ';width:60px;height:60px;margin-bottom:10px">' + svgIcon(m.icon, 26) + '</div>' +
+        '<div class="' + (t.dir === 'in' ? 'vl in' : 'vl out') + '" style="font-size:24px;font-weight:850;letter-spacing:-.8px">' + (t.dir === 'in' ? '+' : '-') + ' ' + esc(rp(t.amount)) + '</div>' +
+        '<div class="small-note mt8">' + esc(t.title) + '</div>' +
+        '<div style="margin-top:8px"><span class="badge ' + (t.dir === 'in' ? 'ok' : 'red') + '">' + (t.dir === 'in' ? 'PEMASUKAN' : 'PENGELUARAN') + '</span></div>' +
+      '</div>' +
+      '<div class="card flat" style="background:var(--surface-2);border-radius:15px;padding:4px 14px">' +
+        '<div class="drow"><span class="k">ID Transaksi</span><span class="v mono">' + esc(t.id) + '</span></div>' +
+        '<div class="drow"><span class="k">Jenis</span><span class="v">' + esc(m.label) + '</span></div>' +
+        '<div class="drow"><span class="k">Status</span><span class="v"><span class="badge ok">SIMULASI BERHASIL</span></span></div>' +
+        '<div class="drow"><span class="k">Waktu</span><span class="v">' + esc(fmtDateFull(t.date)) + '</span></div>' +
+        (t.sub ? '<div class="drow"><span class="k">Keterangan</span><span class="v">' + esc(t.sub) + '</span></div>' : '') +
+        (t.note ? '<div class="drow"><span class="k">Catatan</span><span class="v">' + esc(t.note) + '</span></div>' : '') +
+      '</div>' +
+      '<div class="sim-banner" style="margin-top:12px">' + svgIcon('alert',18) +
+        '<span>SIMULASI SAJA — Tidak ada uang sungguhan yang diproses. Dokumen ini bukan bukti pembayaran.</span></div>',
+    footer: '<button class="btn btn-danger" id="txDel">' + svgIcon('trash',16) + ' Hapus</button>' +
+            '<button class="btn btn-primary" id="txClose">Tutup</button>',
+    onMount: function(el){
+      el.querySelector('#txClose').addEventListener('click', function(){ closeSheet(); });
+      el.querySelector('#txDel').addEventListener('click', function(){
+        confirmDialog('Hapus transaksi ini?', 'Transaksi simulasi akan dihapus dari riwayat. Saldo tidak diubah otomatis.', function(){
+          delTx(t.id);
+          closeSheet();
+          renderAll();
+          toast('Transaksi dihapus', 'success');
+        });
+      });
+    }
+  });
+}
+
+function confirmDialog(title, sub, onOk, okLabel){
+  openSheet({
+    title: title,
+    body: '<p class="small-note" style="font-size:12.5px;line-height:1.6;color:var(--text-dim)">' + esc(sub) + '</p>',
+    footer: '<button class="btn btn-ghost" id="dlgNo">Batal</button>' +
+            '<button class="btn btn-danger-solid" id="dlgYes">' + esc(okLabel || 'Lanjutkan') + '</button>',
+    onMount: function(el){
+      el.querySelector('#dlgNo').addEventListener('click', function(){ closeSheet(); });
+      el.querySelector('#dlgYes').addEventListener('click', function(){ closeSheet(); onOk(); });
+    }
+  });
+}
+
+/* -------------------------------------------------------------
+   17. SHEETS — PULSA & TAGIHAN (demo payments)
+   ------------------------------------------------------------- */
+function pulsaSheet(){
+  const ops = [10000,25000,50000,100000];
+  openSheet({
+    title: 'Pulsa Demo',
+    subtitle: 'Pembelian pulsa simulasi',
+    body:
+      '<div class="sim-banner">' + svgIcon('info',18) + '<span>SIMULASI SAJA — Tidak ada uang sungguhan yang diproses.</span></div>' +
+      '<div class="field"><label>Nomor Tujuan (fiktif)</label>' +
+      '<input class="input" id="plNum" type="tel" inputmode="numeric" maxlength="14" value="081200000009"></div>' +
+      '<div class="field"><label>Pilih Nominal</label></div>' +
+      '<div class="preset-grid" id="plGrid">' +
+      ops.map(function(o){ return '<button class="preset" data-amt="' + o + '">' + rp(o) + '</button>'; }).join('') +
+      '</div>',
+    footer: '<button class="btn btn-ghost" id="plCancel">Batal</button>' +
+            '<button class="btn btn-primary" id="plOk">Beli Pulsa Demo</button>',
+    onMount: function(el){
+      let amt = 0;
+      const grid = el.querySelector('#plGrid');
+      grid.addEventListener('click', function(e){
+        const b = e.target.closest('.preset');
+        if(!b) return;
+        grid.querySelectorAll('.preset').forEach(function(x){ x.classList.remove('on'); });
+        b.classList.add('on'); amt = Number(b.dataset.amt);
+      });
+      el.querySelector('#plCancel').addEventListener('click', function(){ closeSheet(); });
+      el.querySelector('#plOk').addEventListener('click', function(){
+        const num = el.querySelector('#plNum').value.trim();
+        if(num.length < 8){ toast('Nomor tujuan minimal 8 digit','error'); return; }
+        if(!amt){ toast('Pilih nominal pulsa demo','error'); return; }
+        if(amt > state.balance){ toast('Saldo demo tidak mencukupi','error'); return; }
+        closeSheet();
+        const tx = createTx({ dir:'out', kind:'pulsa', title:'Pulsa Demo', sub:num, amount:amt, note:'Pembelian pulsa simulasi' });
+        setBalanceValue(state.balance - amt, true);
+        pushNotif('Pulsa Demo berhasil', rp(amt) + ' untuk ' + num + ' (simulasi).', 'phone');
+        renderAll();
+        successSheet('Pulsa Demo Berhasil', amt, 'Pembelian pulsa simulasi tercatat.', tx.id);
+      });
+    }
+  });
+}
+
+function tagihanSheet(){
+  const bills = [
+    { id:'listrik', name:'Listrik Demo', amt:87500, icon:'bolt' },
+    { id:'air', name:'Air Demo', amt:62000, icon:'sparkle' },
+    { id:'internet', name:'Internet Demo', amt:145000, icon:'sparkle' },
+    { id:'kartu', name:'Kartu Demo', amt:120000, icon:'wallet' }
+  ];
+  let sel = null;
+  openSheet({
+    title: 'Tagihan Demo',
+    subtitle: 'Pembayaran tagihan simulasi',
+    body:
+      '<div class="sim-banner">' + svgIcon('info',18) + '<span>SIMULASI SAJA — Tidak ada uang sungguhan yang diproses.</span></div>' +
+      '<div class="menu-list" id="billList">' +
+      bills.map(function(b){
+        return '<button class="menu-item" data-bill="' + b.id + '">' +
+          '<span class="mi-ico"><i class="ic-wrap">' + svgIcon(b.icon,18) + '</i></span>' +
+          '<span class="mi-mid"><span class="mi-t">' + esc(b.name) + '</span><span class="mi-s">Tagihan simulasi</span></span>' +
+          '<span class="tx-amt">' + esc(rp(b.amt)) + '</span>' +
+        '</button>';
+      }).join('') +
+      '</div>',
+    footer: '<button class="btn btn-ghost" id="blCancel">Batal</button>' +
+            '<button class="btn btn-primary" id="blOk">Bayar Tagihan</button>',
+    onMount: function(el){
+      const list = el.querySelector('#billList');
+      list.addEventListener('click', function(e){
+        const b = e.target.closest('.menu-item');
+        if(!b) return;
+        list.querySelectorAll('.menu-item').forEach(function(x){ x.style.outline = ''; x.style.borderColor = ''; });
+        b.style.borderColor = 'var(--accent)';
+        sel = bills.find(function(x){ return x.id === b.dataset.bill; });
+      });
+      el.querySelector('#blCancel').addEventListener('click', function(){ closeSheet(); });
+      el.querySelector('#blOk').addEventListener('click', function(){
+        if(!sel){ toast('Pilih tagihan demo terlebih dahulu','error'); return; }
+        if(sel.amt > state.balance){ toast('Saldo demo tidak mencukupi','error'); return; }
+        closeSheet();
+        const tx = createTx({ dir:'out', kind:'tagihan', title:sel.name, sub:'Tagihan simulasi', amount:sel.amt, note:'Pembayaran tagihan demo' });
+        setBalanceValue(state.balance - sel.amt, true);
+        pushNotif('Tagihan Demo dibayar', rp(sel.amt) + ' untuk ' + sel.name + ' (simulasi).', 'receipt');
+        renderAll();
+        successSheet('Tagihan Dibayar (Simulasi)', sel.amt, 'Pembayaran simulasi tercatat.', tx.id);
+      });
+    }
+  });
+}
+
+/* -------------------------------------------------------------
+   18. QR PAGE
+   ------------------------------------------------------------- */
+let qrPayloadCache = '';
+
+function buildQRPayload(name, amt, note){
+  const p = ['GWDEMO1',
+    'NAME=' + encodeURIComponent(name || 'Merchant Demo'),
+    'AMT=' + (amt || 0),
+    'NOTE=' + encodeURIComponent(note || ''),
+    'TS=' + Date.now()
+  ];
+  return p.join('|');
+}
+function parseQRPayload(str){
+  const s = String(str || '').trim();
+  if(s.indexOf('GWDEMO1|') !== 0) return null;
+  const parts = s.split('|');
+  const out = { name:'Merchant Demo', amt:0, note:'' };
+  parts.forEach(function(p){
+    const i = p.indexOf('=');
+    if(i < 0) return;
+    const k = p.slice(0, i), v = p.slice(i+1);
+    if(k === 'NAME') out.name = decodeURIComponent(v);
+    else if(k === 'AMT') out.amt = Number(v) || 0;
+    else if(k === 'NOTE') out.note = decodeURIComponent(v);
+  });
+  return out;
+}
+
+function ensureQR(){
+  const frame = document.getElementById('qrFrame');
+  if(!frame) return;
+  if(!frame.dataset.done){
+    frame.dataset.done = '1';
+    refreshQR();
+  }
+}
+
+function refreshQR(){
+  const frame = document.getElementById('qrFrame');
+  if(!frame) return;
+  const nameEl = document.getElementById('qrName');
+  const amtEl = document.getElementById('qrAmount');
+  const noteEl = document.getElementById('qrNote');
+
+  const name = (nameEl && nameEl.value.trim()) || 'Merchant Demo';
+  const amt = amtEl ? parseAmount(amtEl.value) : 0;
+  const note = noteEl ? noteEl.value.trim() : '';
+
+  const payload = buildQRPayload(name, amt, note);
+  qrPayloadCache = payload;
+
+  let svg;
+  try{
+    svg = QR.toSVG(payload, 6, 2);
+  }catch(e){
+    svg = '<div style="display:grid;place-items:center;height:100%;color:#666;font-size:12px;text-align:center;padding:16px">Gagal membuat QR demo<br><small>' + esc(e.message) + '</small></div>';
+  }
+  frame.innerHTML = svg + '<div class="qr-watermark">DEMO QR</div>';
+
+  const t = document.getElementById('qrTitle');
+  const s = document.getElementById('qrSub');
+  if(t) t.textContent = name;
+  if(s) s.textContent = (amt ? rp(amt) + ' · ' : '') + 'QR simulasi · tidak dapat digunakan untuk pembayaran nyata';
+}
+
+/* --- QR Scanning --- */
+let scanStream = null, scanRAF = null, scanDetector = null;
+
+function stopScan(){
+  if(scanRAF){ cancelAnimationFrame(scanRAF); scanRAF = null; }
+  if(scanStream){
+    scanStream.getTracks().forEach(function(t){ try{ t.stop(); }catch(e){} });
+    scanStream = null;
+  }
+  scanDetector = null;
+  const v = document.getElementById('scanVideo');
+  if(v) v.srcObject = null;
+}
+
+async function startScan(){
+  const wrap = document.getElementById('scanWrap');
+  const idle = document.getElementById('scanIdle');
+  const status = document.getElementById('scanStatus');
+  const video = document.getElementById('scanVideo');
+
+  if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){
+    toast('Browser tidak mendukung akses kamera', 'error');
+    if(status) status.textContent = 'Kamera tidak tersedia. Gunakan input kode manual.';
+    return;
+  }
+  const hasDetector = ('BarcodeDetector' in window);
+
+  try{
+    scanStream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'environment' }, audio:false });
+  }catch(e){
+    toast('Izin kamera ditolak', 'error');
+    if(status) status.textContent = 'Tidak dapat mengakses kamera. Gunakan input kode manual.';
+    return;
+  }
+
+  if(idle) idle.style.display = 'none';
+  if(wrap) wrap.style.display = 'block';
+  video.srcObject = scanStream;
+  try{ await video.play(); }catch(e){}
+
+  if(status) status.textContent = hasDetector
+    ? 'Arahkan kamera ke QR demo...'
+    : 'Browser ini tidak mendukung pemindaian otomatis (BarcodeDetector). Gunakan input kode manual.';
+
+  if(!hasDetector) return;
+
+  try{
+    scanDetector = new window.BarcodeDetector({ formats: ['qr_code'] });
+  }catch(e){
+    try{ scanDetector = new window.BarcodeDetector(); }
+    catch(e2){ scanDetector = null; }
+  }
+  if(!scanDetector){
+    if(status) status.textContent = 'Pemindaian otomatis tidak tersedia. Gunakan input kode manual.';
+    return;
+  }
+
+  let busy = false;
+  const tick = async function(){
+    if(!scanStream){ return; }
+    if(!busy && video.readyState === video.HAVE_ENOUGH_DATA){
+      busy = true;
+      try{
+        const codes = await scanDetector.detect(video);
+        if(codes && codes.length){
+          const val = codes[0].rawValue || '';
+          stopScan();
+          const w = document.getElementById('scanWrap');
+          const i = document.getElementById('scanIdle');
+          if(w) w.style.display = 'none';
+          if(i) i.style.display = 'block';
+          handleScannedValue(val);
+          return;
+        }
+      }catch(e){ /* ignore frame errors */ }
+      busy = false;
+    }
+    scanRAF = requestAnimationFrame(tick);
+  };
+  scanRAF = requestAnimationFrame(tick);
+}
+
+function handleScannedValue(val){
+  const parsed = parseQRPayload(val);
+  if(parsed){
+    if(parsed.amt > 0){
+      qrPaySheet(parsed.name, parsed.amt, parsed.note);
+    } else {
+      qrPaySheet(parsed.name, 0, parsed.note, true);
+    }
+    return;
+  }
+  // QR generik — tetap bisa dipakai sebagai penerima demo
+  qrPaySheet('Penerima QR Demo', 0, '', true);
+}
+
+function qrPaySheet(name, amt, note, needAmount){
+  const body =
+    '<div class="sim-banner">' + svgIcon('info',18) + '<span>SIMULASI SAJA — Tidak ada uang sungguhan yang diproses.</span></div>' +
+    '<div class="card flat" style="background:var(--surface-2);border-radius:15px;padding:14px;margin-bottom:13px">' +
+      '<div class="small-note">Penerima QR Demo</div>' +
+      '<div style="font-size:15px;font-weight:850;margin-top:4px">' + esc(name) + '</div>' +
+      (note ? '<div class="small-note mt8">' + esc(note) + '</div>' : '') +
+    '</div>' +
+    (needAmount
+      ? '<div class="field"><label>Nominal Pembayaran</label>' +
+        '<div class="input-prefix"><span class="pfx">Rp</span>' +
+        '<input class="input amount-input" id="qpAmt" type="text" inputmode="numeric" placeholder="0" style="padding-left:40px!important"></div></div>' +
+        '<div class="preset-grid" id="qpPresets">' +
+          [10000,25000,50000,100000].map(function(p){ return '<button class="preset" data-amt="' + p + '">' + rp(p) + '</button>'; }).join('') +
+        '</div>'
+      : '<div class="card flat" style="background:var(--surface-2);border-radius:15px;padding:14px;text-align:center">' +
+          '<div class="small-note">Nominal</div>' +
+          '<div style="font-size:24px;font-weight:850;letter-spacing:-.8px;margin-top:4px">' + esc(rp(amt)) + '</div>' +
+        '</div>');
+
+  openSheet({
+    title: 'Pembayaran QR Demo',
+    subtitle: 'Konfirmasi pembayaran simulasi',
+    body: body,
+    footer: '<button class="btn btn-ghost" id="qpCancel">Batal</button>' +
+            '<button class="btn btn-primary" id="qpOk">Bayar (Simulasi)</button>',
+    onMount: function(el){
+      let finalAmt = amt;
+      if(needAmount){
+        const inp = el.querySelector('#qpAmt');
+        const pg = el.querySelector('#qpPresets');
+        inp.addEventListener('input', function(){ fmtAmountInput(inp); finalAmt = parseAmount(inp.value); });
+        pg.addEventListener('click', function(e){
+          const b = e.target.closest('.preset');
+          if(!b) return;
+          pg.querySelectorAll('.preset').forEach(function(x){ x.classList.remove('on'); });
+          b.classList.add('on');
+          inp.value = Number(b.dataset.amt).toLocaleString('id-ID');
+          finalAmt = Number(b.dataset.amt);
+        });
+      }
+      el.querySelector('#qpCancel').addEventListener('click', function(){ closeSheet(); });
+      el.querySelector('#qpOk').addEventListener('click', function(){
+        if(needAmount) finalAmt = parseAmount(el.querySelector('#qpAmt').value);
+        if(!finalAmt || finalAmt < 1000){ toast('Nominal minimal Rp 1.000', 'error'); return; }
+        if(finalAmt > state.balance){ toast('Saldo demo tidak mencukupi', 'error'); return; }
+        closeSheet();
+        const tx = createTx({
+          dir:'out', kind:'qr', title:'Bayar QR · ' + name,
+          sub:'QR Demo', amount:finalAmt, note:note || 'Pembayaran QR simulasi'
+        });
+        setBalanceValue(state.balance - finalAmt, true);
+        pushNotif('Pembayaran QR Demo', rp(finalAmt) + ' ke ' + name + ' (simulasi).', 'qr');
+        renderAll();
+        successSheet('Pembayaran QR Berhasil (Simulasi)', finalAmt, 'Pembayaran simulasi tercatat.', tx.id);
+      });
+    }
+  });
+}
+
+function manualScanSheet(){
+  openSheet({
+    title: 'Input Kode QR Manual',
+    subtitle: 'Tempel payload QR demo',
+    body:
+      '<div class="sim-banner">' + svgIcon('info',18) + '<span>SIMULASI SAJA — Tidak ada uang sungguhan yang diproses.</span></div>' +
+      '<div class="field"><label>Payload QR Demo</label>' +
+      '<textarea class="input" id="msVal" placeholder="GWDEMO1|NAME=Merchant%20Demo|AMT=25000|NOTE=Demo"></textarea></div>' +
+      '<button class="btn btn-ghost full" id="msSample">' + svgIcon('copy',16) + ' Gunakan Contoh Payload</button>',
+    footer: '<button class="btn btn-ghost" id="msCancel">Batal</button>' +
+            '<button class="btn btn-primary" id="msOk">Proses</button>',
+    onMount: function(el){
+      const ta = el.querySelector('#msVal');
+      el.querySelector('#msSample').addEventListener('click', function(){
+        ta.value = buildQRPayload('Kedai Demo', 25000, 'Pesanan simulasi');
+      });
+      el.querySelector('#msCancel').addEventListener('click', function(){ closeSheet(); });
+      el.querySelector('#msOk').addEventListener('click', function(){
+        const v = ta.value.trim();
+        if(!v){ toast('Masukkan payload QR demo', 'error'); return; }
+        closeSheet();
+        setTimeout(function(){ handleScannedValue(v); }, 260);
+      });
+    }
+  });
+}
+
+/* -------------------------------------------------------------
+   19. NOTIFICATIONS
+   ------------------------------------------------------------- */
+function pushNotif(title, body, icon){
+  state.notifs.unshift({
+    id: uid('N'), title: title, body: body,
+    time: Date.now(), read: false, icon: icon || 'info'
+  });
+  if(state.notifs.length > 40) state.notifs.length = 40;
+  save();
+  renderProfile();
+}
+
+function notifSheet(){
+  state.notifs.forEach(function(n){ n.read = true; });
+  save();
+  renderProfile();
+  const body = state.notifs.length
+    ? state.notifs.map(function(n){
+        return '<div class="notif-item ' + (n.read ? '' : 'unread') + '">' +
+          '<span class="ni-ico">' + svgIcon(n.icon || 'info', 17) + '</span>' +
+          '<div style="flex:1;min-width:0">' +
+            '<div class="ni-t">' + esc(n.title) + '</div>' +
+            '<div class="ni-b">' + esc(n.body) + '</div>' +
+            '<div class="ni-time">' + esc(fmtDateLabel(new Date(n.time).toISOString())) + '</div>' +
+          '</div>' +
+        '</div>';
+      }).join('')
+    : emptyHTML('bell','Tidak ada notifikasi','Notifikasi demo akan muncul di sini.');
+
+  openSheet({
+    title: 'Notifikasi Demo',
+    subtitle: 'Semua pesan bersifat simulasi',
+    body: body,
+    footer: '<button class="btn btn-ghost" id="nfClear">' + svgIcon('trash',16) + ' Hapus Semua</button>' +
+            '<button class="btn btn-primary" id="nfClose">Tutup</button>',
+    onMount: function(el){
+      el.querySelector('#nfClose').addEventListener('click', function(){ closeSheet(); });
+      el.querySelector('#nfClear').addEventListener('click', function(){
+        state.notifs = []; save(); renderProfile(); closeSheet();
+        toast('Notifikasi dibersihkan', 'success');
+      });
+    }
+  });
+}
+
+/* -------------------------------------------------------------
+   20. PROFILE EDIT
+   ------------------------------------------------------------- */
+function editProfileSheet(){
+  openSheet({
+    title: 'Edit Profil Demo',
+    subtitle: 'Data hanya tersimpan lokal',
+    body:
+      '<div class="field"><label>Nama Pengguna</label>' +
+      '<input class="input" id="epName" type="text" maxlength="24" value="' + esc(state.user.name) + '"></div>' +
+      '<div class="field"><label>ID Pengguna (fiktif)</label>' +
+      '<input class="input" id="epId" type="text" maxlength="20" value="' + esc(state.user.id) + '"></div>' +
+      '<div class="field"><label>Email Demo</label>' +
+      '<input class="input" id="epEmail" type="text" maxlength="40" value="' + esc(state.user.email) + '"></div>' +
+      '<p class="small-note">Jangan masukkan data pribadi asli. Aplikasi ini hanya simulator UI.</p>',
+    footer: '<button class="btn btn-ghost" id="epCancel">Batal</button>' +
+            '<button class="btn btn-primary" id="epSave">Simpan</button>',
+    onMount: function(el){
+      el.querySelector('#epCancel').addEventListener('click', function(){ closeSheet(); });
+      el.querySelector('#epSave').addEventListener('click', function(){
+        const n = el.querySelector('#epName').value.trim();
+        const i = el.querySelector('#epId').value.trim();
+        const e = el.querySelector('#epEmail').value.trim();
+        if(!n){ toast('Nama tidak boleh kosong', 'error'); return; }
+        state.user.name = n;
+        state.user.id = i || 'GW-0001-DEMO';
+        state.user.email = e || 'demo@xtan.local';
+        save(); renderProfile(); closeSheet();
+        toast('Profil demo diperbarui', 'success');
+      });
+    }
+  });
+}
+
+function avatarSheet(){
+  openSheet({
+    title: 'Pilih Avatar Demo',
+    subtitle: 'Disimpan lokal sebagai data URL',
+    body:
+      '<div class="field"><label>Unggah gambar (maks. kecil)</label>' +
+      '<input class="input" id="avFile" type="file" accept="image/*"></div>' +
+      '<p class="small-note">Gambar diproses di perangkat kamu dan tidak diunggah ke mana pun.</p>',
+    footer: '<button class="btn btn-ghost" id="avCancel">Batal</button>' +
+            '<button class="btn btn-danger" id="avReset">Hapus Avatar</button>',
+    onMount: function(el){
+      el.querySelector('#avCancel').addEventListener('click', function(){ closeSheet(); });
+      el.querySelector('#avReset').addEventListener('click', function(){
+        state.user.avatar = ''; save(); renderProfile(); closeSheet();
+        toast('Avatar dihapus', 'success');
+      });
+      el.querySelector('#avFile').addEventListener('change', function(ev){
+        const f = ev.target.files && ev.target.files[0];
+        if(!f) return;
+        if(f.size > 900000){ toast('Ukuran gambar terlalu besar (maks ~900KB)', 'error'); return; }
+        const r = new FileReader();
+        r.onload = function(){
+          state.user.avatar = r.result;
+          save(); renderProfile(); closeSheet();
+          toast('Avatar diperbarui', 'success');
+        };
+        r.readAsDataURL(f);
+      });
+    }
+  });
+}
+
+/* -------------------------------------------------------------
+   21. SETTINGS PAGE
+   ------------------------------------------------------------- */
+function applyTheme(){
+  document.documentElement.setAttribute('data-theme', state.settings.theme);
+  const meta = document.querySelector('meta[name="theme-color"]');
+  if(meta) meta.setAttribute('content', state.settings.theme === 'dark' ? '#080A14' : '#5B4BFF');
+}
+function applyToggles(){
+  document.documentElement.classList.toggle('no-anim', !state.settings.anim);
+  document.documentElement.classList.toggle('no-fx', !state.settings.fx);
+}
+function renderSettingsUI(){
+  const swD = document.getElementById('swDark');
+  const swA = document.getElementById('swAnim');
+  const swF = document.getElementById('swFx');
+  if(swD) swD.classList.toggle('on', state.settings.theme === 'dark');
+  if(swA) swA.classList.toggle('on', !!state.settings.anim);
+  if(swF) swF.classList.toggle('on', !!state.settings.fx);
+}
+
+function exportJSON(){
+  const data = JSON.stringify(state, null, 2);
+  const blob = new Blob([data], { type:'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = 'gwallet-demo-backup-' + new Date().toISOString().slice(0,10) + '.json';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  setTimeout(function(){ URL.revokeObjectURL(url); }, 1500);
+  toast('Data demo diekspor', 'success');
+}
+
+function importJSON(file){
+  const r = new FileReader();
+  r.onload = function(){
+    try{
+      const obj = JSON.parse(r.result);
+      if(typeof obj !== 'object' || obj === null) throw new Error('Format tidak valid');
+      if(typeof obj.balance !== 'number' || !Array.isArray(obj.tx)) throw new Error('Struktur tidak dikenali');
+      const base = defaultState();
+      state = Object.assign(base, obj);
+      state.settings = Object.assign(base.settings, obj.settings || {});
+      state.user = Object.assign(base.user, obj.user || {});
+      state.balance = Math.max(0, Math.round(state.balance));
+      save();
+      applyTheme(); applyToggles(); displayBalance = state.balance;
+      renderAll();
+      toast('Data demo berhasil diimpor', 'success');
+    }catch(e){
+      toast('Gagal impor: ' + e.message, 'error');
+    }
+  };
+  r.readAsText(file);
+}
+
+/* -------------------------------------------------------------
+   22. ADMIN PANEL
+   ------------------------------------------------------------- */
+function renderAdmin(){
+  const b = document.getElementById('admBalance');
+  if(b) b.value = Number(state.balance).toLocaleString('id-ID');
+  const n = document.getElementById('admName');
+  if(n) n.value = state.user.name;
+  const i = document.getElementById('admId');
+  if(i) i.value = state.user.id;
+  const t = document.getElementById('admTheme');
+  if(t) t.value = state.settings.theme;
+
+  const qb = document.getElementById('admQuickBal');
+  if(qb && !qb.dataset.done){
+    qb.dataset.done = '1';
+    qb.innerHTML = [0,50000,100000,500000,1000000,5000000].map(function(v){
+      return '<button class="chip" data-bal="' + v + '">' + rp(v) + '</button>';
+    }).join('');
+  }
+
+  const s = txStats(state.tx);
+  const sum = document.getElementById('admSummary');
+  if(sum){
+    sum.innerHTML =
+      '<div class="drow"><span class="k">Saldo saat ini</span><span class="v">' + esc(rp(state.balance)) + '</span></div>' +
+      '<div class="drow"><span class="k">Saldo awal</span><span class="v">' + esc(rp(state.initialBalance)) + '</span></div>' +
+      '<div class="drow"><span class="k">Jumlah transaksi</span><span class="v">' + state.tx.length + '</span></div>' +
+      '<div class="drow"><span class="k">Total masuk</span><span class="v" style="color:var(--success)">' + esc(rp(s.inc)) + '</span></div>' +
+      '<div class="drow"><span class="k">Total keluar</span><span class="v" style="color:var(--danger)">' + esc(rp(s.out)) + '</span></div>' +
+      '<div class="drow"><span class="k">Ukuran data</span><span class="v">' + (JSON.stringify(state).length / 1024).toFixed(1) + ' KB</span></div>';
+  }
+}
+
+function generateRandomTx(count){
+  const ins = [
+    { kind:'topup', title:'Top Up Demo', subs:['Bank Demo Nusantara','Gerai Demo Retail','E-Wallet Demo Kita'] },
+    { kind:'receive', title:'Terima Saldo Demo', subs:['Transfer masuk simulasi'] },
+    { kind:'bonus', title:'Bonus Demo', subs:['Cashback simulasi','Voucher simulasi'] }
+  ];
+  const outs = [
+    { kind:'transfer', title:'Transfer Demo', subs:['Andi Pratama','Bunga Lestari','Citra Dewi','Darma Wijaya'] },
+    { kind:'qr', title:'Bayar QR Demo', subs:['Kedai Demo','Warung Demo','Toko Demo'] },
+    { kind:'pulsa', title:'Pulsa Demo', subs:['081200000009'] },
+    { kind:'tagihan', title:'Tagihan Demo', subs:['Listrik Demo','Internet Demo','Air Demo'] }
+  ];
+  const notes = ['', 'Simulasi transaksi', 'Data demo', 'Uji coba UI', 'Contoh riwayat'];
+
+  let balanceDelta = 0;
+  for(let i=0;i<count;i++){
+    const isIn = Math.random() < 0.4;
+    const pool = isIn ? ins : outs;
+    const pick = pool[Math.floor(Math.random()*pool.length)];
+    const amt = [5000,10000,15000,25000,35000,50000,75000,100000,150000,250000][Math.floor(Math.random()*10)];
+    const daysAgo = Math.floor(Math.random()*13);
+    const d = new Date();
+    d.setDate(d.getDate() - daysAgo);
+    d.setHours(Math.floor(Math.random()*23), Math.floor(Math.random()*59), 0, 0);
+
+    createTx({
+      dir: isIn ? 'in' : 'out',
+      kind: pick.kind,
+      title: pick.title,
+      sub: pick.subs[Math.floor(Math.random()*pick.subs.length)],
+      amount: amt,
+      note: notes[Math.floor(Math.random()*notes.length)],
+      date: d.toISOString()
+    });
+    balanceDelta += isIn ? amt : -amt;
+  }
+  const nb = Math.max(0, state.balance + balanceDelta);
+  setBalanceValue(nb, true);
+  state.tx.sort(function(a,b){ return new Date(b.date) - new Date(a.date); });
+  save();
+}
+
+function seedSampleData(){
+  const samples = [
+    { dir:'in',  kind:'topup',    title:'Top Up Demo',      sub:'Bank Demo Nusantara', amount:150000, days:11 },
+    { dir:'out', kind:'qr',       title:'Bayar QR Demo',    sub:'Kedai Demo',          amount:28000,  days:10 },
+    { dir:'out', kind:'transfer', title:'Transfer Demo',    sub:'Andi Pratama',        amount:50000,  days:8  },
+    { dir:'in',  kind:'receive',  title:'Terima Saldo Demo',sub:'Transfer masuk',      amount:75000,  days:6  },
+    { dir:'out', kind:'tagihan',  title:'Tagihan Demo',     sub:'Internet Demo',       amount:145000, days:5  },
+    { dir:'in',  kind:'bonus',    title:'Bonus Demo',       sub:'Cashback simulasi',   amount:10000,  days:4  },
+    { dir:'out', kind:'pulsa',    title:'Pulsa Demo',       sub:'081200000009',        amount:25000,  days:2  },
+    { dir:'out', kind:'qr',       title:'Bayar QR Demo',    sub:'Toko Demo',           amount:42000,  days:1  }
+  ];
+  state.tx = [];
+  samples.forEach(function(s){
+    const d = new Date();
+    d.setDate(d.getDate() - s.days);
+    d.setHours(9 + (s.days % 8), (s.days * 7) % 60, 0, 0);
+    createTx({ dir:s.dir, kind:s.kind, title:s.title, sub:s.sub, amount:s.amount, note:'Contoh data demo', date:d.toISOString() });
+  });
+  state.tx.sort(function(a,b){ return new Date(b.date) - new Date(a.date); });
+  save();
+}
+
+/* -------------------------------------------------------------
+   23. RENDER ALL
+   ------------------------------------------------------------- */
+function renderAll(){
+  displayBalance = state.balance;
+  paintBalance();
+  renderShortcuts();
+  renderPromos();
+  renderHomeTx();
+  renderStatsAll();
+  renderActivity();
+  renderProfile();
+  renderSettingsUI();
+  hydrateIcons(document);
+}
+
+/* -------------------------------------------------------------
+   24. EVENT WIRING
+   ------------------------------------------------------------- */
+function handleAction(act){
+  switch(act){
+    case 'topup': topUpSheet(); break;
+    case 'transfer': transferSheet(); break;
+    case 'qr': showPage('qr'); break;
+    case 'history': showPage('activity'); break;
+    case 'promos': showPage('promos'); break;
+    case 'settings': showPage('settings'); break;
+    case 'admin': showPage('admin'); break;
+    case 'wallet': showPage('wallet'); break;
+    case 'pulsa': pulsaSheet(); break;
+    case 'tagihan': tagihanSheet(); break;
+    case 'notifs': notifSheet(); break;
+    case 'about': aboutSheet(); break;
+    case 'setInit': initialBalanceSheet(); break;
+    default: break;
+  }
+}
+
+function aboutSheet(){
+  openSheet({
+    title: 'Tentang G-Wallet Demo',
+    subtitle: 'Powered by Xtan',
+    body:
+      '<div class="card flat" style="background:var(--surface-2);border-radius:15px;padding:14px">' +
+        '<div style="display:flex;align-items:center;gap:12px">' +
+          '<div class="brand-mark" style="width:44px;height:44px;border-radius:14px;font-size:20px">G</div>' +
+          '<div><div style="font-size:15px;font-weight:850">G-Wallet Demo</div>' +
+          '<div class="small-note">Versi 1.0.0 · Simulator UI</div></div>' +
+        '</div>' +
+        '<div class="divider"></div>' +
+        '<p class="small-note" style="font-size:12px;line-height:1.65;color:var(--text-dim)">' +
+          'G-Wallet Demo adalah simulator dompet digital yang dibuat untuk keperluan UI/UX, pembelajaran, dan demonstrasi. ' +
+          'Seluruh visual, ikon, dan identitas dibuat original dan tidak berafiliasi dengan layanan pembayaran mana pun.' +
+        '</p>' +
+      '</div>' +
+      '<div class="card flat" style="background:var(--surface-2);border-radius:15px;padding:4px 14px;margin-top:12px">' +
+        '<div class="drow"><span class="k">Pengembang</span><span class="v">Xtan</span></div>' +
+        '<div class="drow"><span class="k">Penyimpanan</span><span class="v">localStorage (lokal)</span></div>' +
+        '<div class="drow"><span class="k">Backend</span><span class="v">Tidak ada</span></div>' +
+        '<div class="drow"><span class="k">Pembayaran nyata</span><span class="v">Tidak ada</span></div>' +
+      '</div>' +
+      '<div class="sim-banner" style="margin-top:12px">' + svgIcon('shield',18) +
+        '<span>Aplikasi ini tidak meminta PIN, OTP, nomor rekening, atau data pembayaran asli.</span></div>',
+    footer: '<button class="btn btn-primary full" id="abClose">Tutup</button>',
+    onMount: function(el){
+      el.querySelector('#abClose').addEventListener('click', function(){ closeSheet(); });
+    }
+  });
+}
+
+function initialBalanceSheet(){
+  openSheet({
+    title: 'Atur Saldo Awal',
+    subtitle: 'Konfigurasi saldo demo',
+    body:
+      '<div class="sim-banner">' + svgIcon('info',18) + '<span>SIMULASI SAJA — Tidak ada uang sungguhan yang diproses.</span></div>' +
+      '<div class="field"><label>Saldo Awal (Rp)</label>' +
+      '<div class="input-prefix"><span class="pfx">Rp</span>' +
+      '<input class="input amount-input" id="ibVal" type="text" inputmode="numeric" value="' + Number(state.initialBalance).toLocaleString('id-ID') + '" style="padding-left:40px!important"></div></div>' +
+      '<div class="preset-grid" id="ibPresets">' +
+        [0,100000,250000,500000,1000000,5000000].map(function(v){ return '<button class="preset" data-amt="' + v + '">' + rp(v) + '</button>'; }).join('') +
+      '</div>' +
+      '<p class="small-note mt12">Menyimpan akan mengubah saldo awal dan saldo saat ini ke nilai baru (tidak boleh negatif).</p>',
+    footer: '<button class="btn btn-ghost" id="ibCancel">Batal</button>' +
+            '<button class="btn btn-primary" id="ibSave">Simpan</button>',
+    onMount: function(el){
+      const inp = el.querySelector('#ibVal');
+      inp.addEventListener('input', function(){ fmtAmountInput(inp); });
+      el.querySelector('#ibPresets').addEventListener('click', function(e){
+        const b = e.target.closest('.preset');
+        if(!b) return;
+        el.querySelectorAll('.preset').forEach(function(x){ x.classList.remove('on'); });
+        b.classList.add('on');
+        inp.value = Number(b.dataset.amt).toLocaleString('id-ID');
+      });
+      el.querySelector('#ibCancel').addEventListener('click', function(){ closeSheet(); });
+      el.querySelector('#ibSave').addEventListener('click', function(){
+        const v = parseAmount(inp.value);
+        state.initialBalance = Math.max(0, v);
+        closeSheet();
+        setBalanceValue(Math.max(0, v), true);
+        renderStatsAll();
+        toast('Saldo awal diperbarui', 'success');
+      });
+    }
+  });
+}
+
+function promoDetailSheet(id){
+  const p = PROMOS.find(function(x){ return x.id === id; });
+  if(!p) return;
+  openSheet({
+    title: p.title,
+    subtitle: p.tag + ' · Promo Demo',
+    body:
+      '<div class="promo-card ' + p.cls + '" style="flex:none;min-height:120px;border-radius:18px">' +
+        '<span class="promo-tag">' + esc(p.tag) + '</span>' +
+        '<div><h4>' + esc(p.title) + '</h4><p>' + esc(p.sub) + '</p></div>' +
+      '</div>' +
+      '<p class="small-note mt12" style="font-size:12px;line-height:1.65;color:var(--text-dim)">' + esc(p.desc) + '</p>' +
+      '<div class="card flat mt12" style="background:var(--surface-2);border-radius:15px;padding:4px 14px">' +
+        '<div class="drow"><span class="k">Syarat &amp; Ketentuan</span><span class="v"></span></div>' +
+        p.terms.map(function(t){ return '<div class="drow"><span class="k" style="flex:1;text-align:left;color:var(--text-dim)">• ' + esc(t) + '</span></div>'; }).join('') +
+      '</div>' +
+      '<div class="sim-banner" style="margin-top:12px">' + svgIcon('alert',18) +
+        '<span>Promo ini fiktif dan tidak dapat diklaim di dunia nyata.</span></div>',
+    footer: '<button class="btn btn-ghost" id="prClose">Tutup</button>' +
+            '<button class="btn btn-primary" id="prClaim">' + svgIcon('gift',16) + ' Klaim Demo</button>',
+    onMount: function(el){
+      el.querySelector('#prClose').addEventListener('click', function(){ closeSheet(); });
+      el.querySelector('#prClaim').addEventListener('click', function(){
+        closeSheet();
+        pushNotif('Promo demo diklaim', p.title + ' berhasil "diklaim" (simulasi). Tidak ada nilai nyata.', 'gift');
+        renderProfile();
+        toast('Promo demo diklaim (simulasi)', 'success');
+      });
+    }
+  });
+}
+
+function bindEvents(){
+  // bottom nav
+  document.getElementById('bottomnav').addEventListener('click', function(e){
+    const b = e.target.closest('[data-nav]');
+    if(!b) return;
+    showPage(b.dataset.nav);
+  });
+
+  // back button
+  document.getElementById('btnBack').addEventListener('click', function(){
+    showPage('profile');
+  });
+
+  // notifications
+  document.getElementById('btnNotif').addEventListener('click', notifSheet);
+
+  // balance eye toggles
+  document.getElementById('btnEye').addEventListener('click', function(){
+    state.balanceVisible = !state.balanceVisible; save(); paintBalance();
+  });
+  document.getElementById('btnEye2').addEventListener('click', function(){
+    state.balanceVisible = !state.balanceVisible; save(); paintBalance();
+  });
+
+  // global action delegation
+  document.addEventListener('click', function(e){
+    const actEl = e.target.closest('[data-act]');
+    if(actEl){
+      handleAction(actEl.dataset.act);
+      return;
+    }
+    const txEl = e.target.closest('[data-tx]');
+    if(txEl){ txDetailSheet(txEl.dataset.tx); return; }
+
+    const promoEl = e.target.closest('[data-promo]');
+    if(promoEl){ promoDetailSheet(promoEl.dataset.promo); return; }
+
+    const claimEl = e.target.closest('[data-promo-claim]');
+    if(claimEl){ promoDetailSheet(claimEl.dataset.promoClaim); return; }
+  });
+
+  // activity filters
+  document.querySelector('.filter-bar').addEventListener('click', function(e){
+    const c = e.target.closest('[data-filter]');
+    if(!c) return;
+    document.querySelectorAll('.filter-bar .chip').forEach(function(x){ x.classList.remove('on'); });
+    c.classList.add('on');
+    actFilter = c.dataset.filter;
+    renderActivity();
+  });
+
+  // search
+  const search = document.getElementById('txSearch');
+  search.addEventListener('input', function(){
+    actQuery = search.value;
+    renderActivity();
+  });
+
+  // QR tabs
+  document.getElementById('qrTabGen').addEventListener('click', function(){
+    document.getElementById('qrTabGen').classList.add('on');
+    document.getElementById('qrTabScan').classList.remove('on');
+    document.getElementById('qrPaneGen').hidden = false;
+    document.getElementById('qrPaneScan').hidden = true;
+    stopScan();
+  });
+  document.getElementById('qrTabScan').addEventListener('click', function(){
+    document.getElementById('qrTabScan').classList.add('on');
+    document.getElementById('qrTabGen').classList.remove('on');
+    document.getElementById('qrPaneGen').hidden = true;
+    document.getElementById('qrPaneScan').hidden = false;
+  });
+
+  // QR controls
+  document.getElementById('qrRefresh').addEventListener('click', function(){
+    refreshQR();
+    toast('QR demo diperbarui', 'success');
+  });
+  document.getElementById('qrName').addEventListener('input', refreshQR);
+  document.getElementById('qrNote').addEventListener('input', refreshQR);
+  document.getElementById('qrAmount').addEventListener('input', function(){
+    fmtAmountInput(this);
+    clearTimeout(this._t);
+    const self = this;
+    this._t = setTimeout(function(){ refreshQR(); }, 260);
+  });
+
+  // QR scan
+  document.getElementById('btnStartScan').addEventListener('click', startScan);
+  document.getElementById('btnManualScan').addEventListener('click', manualScanSheet);
+
+  // profile
+  document.getElementById('btnEditProfile').addEventListener('click', editProfileSheet);
+  document.getElementById('btnChangeAvatar').addEventListener('click', avatarSheet);
+
+  // settings toggles
+  document.getElementById('swDark').addEventListener('click', function(){
+    state.settings.theme = state.settings.theme === 'dark' ? 'light' : 'dark';
+    save(); applyTheme(); renderSettingsUI();
+  });
+  document.getElementById('swAnim').addEventListener('click', function(){
+    state.settings.anim = !state.settings.anim;
+    save(); applyToggles(); renderSettingsUI();
+    toast('Animasi ' + (state.settings.anim ? 'diaktifkan' : 'dimatikan'));
+  });
+  document.getElementById('swFx').addEventListener('click', function(){
+    state.settings.fx = !state.settings.fx;
+    save(); applyToggles(); renderSettingsUI();
+    toast('Efek visual ' + (state.settings.fx ? 'diaktifkan' : 'dimatikan'));
+  });
+
+  // settings data actions
+  document.getElementById('btnExport').addEventListener('click', exportJSON);
+  document.getElementById('btnImport').addEventListener('click', function(){
+    document.getElementById('fileImport').click();
+  });
+  document.getElementById('fileImport').addEventListener('change', function(e){
+    const f = e.target.files && e.target.files[0];
+    if(f) importJSON(f);
+    e.target.value = '';
+  });
+  document.getElementById('btnResetBal').addEventListener('click', function(){
+    confirmDialog('Reset saldo demo?', 'Saldo akan dikembalikan ke saldo awal (' + rp(state.initialBalance) + '). Riwayat transaksi tetap tersimpan.', function(){
+      setBalanceValue(state.initialBalance, true);
+      toast('Saldo demo direset', 'success');
+    }, 'Reset Saldo');
+  });
+  document.getElementById('btnResetTx').addEventListener('click', function(){
+    confirmDialog('Reset transaksi demo?', 'Seluruh riwayat transaksi simulasi akan dihapus. Saldo tidak berubah.', function(){
+      state.tx = []; save(); renderAll();
+      toast('Riwayat transaksi dihapus', 'success');
+    }, 'Hapus Riwayat');
+  });
+  document.getElementById('btnResetAll').addEventListener('click', function(){
+    confirmDialog('Reset seluruh data?', 'Semua data simulasi (saldo, transaksi, profil, pengaturan) akan dihapus permanen dari perangkat ini.', function(){
+      try{ localStorage.removeItem(LS_KEY); }catch(e){}
+      location.reload();
+    }, 'Reset Semua');
+  });
+
+  // admin
+  const admBal = document.getElementById('admBalance');
+  if(admBal){
+    admBal.addEventListener('input', function(){ fmtAmountInput(admBal); });
+    document.getElementById('admQuickBal').addEventListener('click', function(e){
+      const c = e.target.closest('[data-bal]');
+      if(!c) return;
+      admBal.value = Number(c.dataset.bal).toLocaleString('id-ID');
+    });
+    document.getElementById('admSetBal').addEventListener('click', function(){
+      const v = parseAmount(admBal.value);
+      setBalanceValue(v, true);
+      renderAdmin();
+      toast('Saldo diset ke ' + rp(v), 'success');
+    });
+    document.getElementById('admAddBal').addEventListener('click', function(){
+      const v = parseAmount(admBal.value);
+      if(!v){ toast('Masukkan nominal terlebih dahulu', 'error'); return; }
+      setBalanceValue(state.balance + v, true);
+      renderAdmin();
+      toast(rp(v) + ' ditambahkan', 'success');
+    });
+  }
+
+  const admTxAmount = document.getElementById('admTxAmount');
+  if(admTxAmount){
+    admTxAmount.addEventListener('input', function(){ fmtAmountInput(admTxAmount); });
+  }
+
+  document.getElementById('admAddTx').addEventListener('click', function(){
+    const title = document.getElementById('admTxTitle').value.trim() || 'Transaksi Demo';
+    const dir = document.getElementById('admTxDir').value;
+    const amt = parseAmount(document.getElementById('admTxAmount').value);
+    if(!amt){ toast('Masukkan nominal transaksi', 'error'); return; }
+    if(dir === 'out' && amt > state.balance){ toast('Saldo demo tidak mencukupi', 'error'); return; }
+    createTx({ dir:dir, kind:'adjust', title:title, sub:'Dibuat dari panel admin', amount:amt, note:'Transaksi dummy' });
+    setBalanceValue(dir === 'in' ? state.balance + amt : state.balance - amt, true);
+    document.getElementById('admTxTitle').value = '';
+    document.getElementById('admTxAmount').value = '';
+    renderAll(); renderAdmin();
+    toast('Transaksi dummy ditambahkan', 'success');
+  });
+
+  document.getElementById('admGen').addEventListener('click', function(){
+    const n = Number(document.getElementById('admGenCount').value) || 10;
+    generateRandomTx(n);
+    renderAll(); renderAdmin();
+    toast(n + ' transaksi random dibuat', 'success');
+  });
+  document.getElementById('admSeed').addEventListener('click', function(){
+    confirmDialog('Muat data contoh?', 'Riwayat transaksi saat ini akan diganti dengan data contoh demo.', function(){
+      seedSampleData();
+      setBalanceValue(state.initialBalance, true);
+      renderAll(); renderAdmin();
+      toast('Data contoh dimuat', 'success');
+    }, 'Muat Data');
+  });
+  document.getElementById('admReset').addEventListener('click', function(){
+    confirmDialog('Reset simulator?', 'Saldo, riwayat, dan profil dikembalikan ke kondisi awal. Pengaturan tema tetap dipertahankan.', function(){
+      const theme = state.settings.theme;
+      const anim = state.settings.anim;
+      const fx = state.settings.fx;
+      state = defaultState();
+      state.settings.theme = theme;
+      state.settings.anim = anim;
+      state.settings.fx = fx;
+      save();
+      renderAll(); renderAdmin();
+      applyTheme(); applyToggles();
+      toast('Simulator direset', 'success');
+    }, 'Reset Simulator');
+  });
+  document.getElementById('admSaveId').addEventListener('click', function(){
+    const n = document.getElementById('admName').value.trim();
+    const i = document.getElementById('admId').value.trim();
+    const t = document.getElementById('admTheme').value;
+    if(!n){ toast('Nama tidak boleh kosong', 'error'); return; }
+    state.user.name = n;
+    state.user.id = i || 'GW-0001-DEMO';
+    state.settings.theme = t;
+    save();
+    applyTheme(); renderProfile(); renderSettingsUI(); renderAdmin();
+    toast('Identitas demo disimpan', 'success');
+  });
+  document.getElementById('admExport').addEventListener('click', exportJSON);
+  document.getElementById('admClearTx').addEventListener('click', function(){
+    confirmDialog('Hapus semua transaksi?', 'Seluruh riwayat transaksi simulasi akan dihapus. Saldo tidak berubah.', function(){
+      state.tx = []; save(); renderAll(); renderAdmin();
+      toast('Semua transaksi dihapus', 'success');
+    }, 'Hapus Semua');
+  });
+
+  // stop camera when page changes away from QR
+  const origShowPage = showPage;
+  showPage = function(name){
+    if(name !== 'qr') stopScan();
+    origShowPage(name);
+  };
+
+  // keyboard escape
+  document.addEventListener('keydown', function(e){
+    if(e.key === 'Escape') closeSheet();
+  });
+}
+
+/* -------------------------------------------------------------
+   25. INIT
+   ------------------------------------------------------------- */
+function init(){
+  state = loadState();
+  displayBalance = state.balance;
+
+  applyTheme();
+  applyToggles();
+
+  // seed demo transactions on very first run
+  if(!state.seeded){
+    state.seeded = true;
+    state.tx = [];
+    const samples = [
+      { dir:'in',  kind:'topup',    title:'Top Up Demo',   sub:'Bank Demo Nusantara', amount:200000, days:6 },
+      { dir:'out', kind:'qr',       title:'Bayar QR Demo', sub:'Kedai Demo',          amount:32000,  days:4 },
+      { dir:'out', kind:'transfer', title:'Transfer Demo', sub:'Andi Pratama',        amount:50000,  days:2 }
+    ];
+    samples.forEach(function(s){
+      const d = new Date();
+      d.setDate(d.getDate() - s.days);
+      d.setHours(10 + s.days, 25, 0, 0);
+      state.tx.push({
+        id: 'TX-' + Date.now().toString(36).toUpperCase() + '-' + uid('').slice(0,4) + '-' + s.days,
+        dir: s.dir, kind: s.kind, title: s.title, sub: s.sub,
+        amount: s.amount, note: 'Contoh data demo',
+        date: d.toISOString(), status:'success', meta:{}
+      });
+    });
+    state.tx.sort(function(a,b){ return new Date(b.date) - new Date(a.date); });
+    save();
+  }
+
+  renderAll();
+  bindEvents();
+  hydrateIcons(document);
+}
+
+if(document.readyState === 'loading'){
+  document.addEventListener('DOMContentLoaded', init);
+} else {
+  init();
+}
+
+})();
+</script>
+</body>
+</html>
